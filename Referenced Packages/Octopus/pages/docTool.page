@@ -1,0 +1,820 @@
+<apex:page controller="astrea_oct.SystemDetailsCtr" sidebar="false" showHeader="false" standardStylesheets="false" action="{!UserInformation}" applyHtmlTag="false" renderAs="pdf" readOnly="true">
+         <head>
+            <style> 
+            tr{page-break-inside:avoid; page-break-after:auto}
+                table{
+                border-style: solid;
+                border-color: #000000;
+                background-color: #ffffff;
+                border-collapse:collapse;
+                border-width: 2px;
+                }
+                .gridtable td {
+                border-width: 2px;
+                padding: 5px;
+                border-style: solid;
+                border-color: #000000;
+                background-color: #ffffff;
+                border-collapse:collapse;
+                border-width: 2px;
+                }
+                body {font-family: Arial Unicode MS;}
+                th {
+                padding: 5px;
+                background-color: #afeeee;
+                color: black;
+                border-style: solid;
+                border-color: #000000;
+                border-collapse:collapse;
+                border-width: 2px;
+                }
+                .gridtable2 td {
+                border-width: 2px;
+                border-style: solid;
+                border-color: #000000;
+                background-color: #ffffff;
+                border-collapse:collapse;
+                border-width: 2px;
+                }
+                .gridtable2 th {
+                background-color: #afeeee;
+                color: black;
+                border-style: solid;
+                border-color: #000000;
+                border-collapse:collapse;
+                border-width: 2px;
+                }
+                
+                font {font-size:150%;
+                }
+                @page{ 
+                size:landscape;
+                /* Put page numbers in the top right corner of each
+                page in the pdf document. */
+                
+                @bottom-right {
+                content: "Page " counter(page);
+                }
+                }
+                }      
+            </style>
+        </head>
+        
+        <body>
+            <center><b><u><font Style="color:blue;" face="Arial"><h1 style="color:blue;">Salesforce Instance Details</h1></font></u></b>
+           <apex:repeat value="{!orgList}" var="org">
+            {!org.name}<br/>
+            <apex:outputPanel rendered="{!IF(org.Street!= '', true, false)}">{!org.Street}<br/></apex:outputPanel>
+            <apex:outputPanel rendered="{!IF(org.City != '', true, false)}">{!org.City}<br/></apex:outputPanel>
+            <apex:outputPanel rendered="{!IF(org.State!= '', true, false)}">{!org.State}<br/></apex:outputPanel>
+            <apex:outputPanel rendered="{!IF(org.country!= '', true, false)}">{!org.country}<br/></apex:outputPanel>
+           </apex:repeat>
+           </center>
+            <br/><br/>
+            <small>
+            
+             <apex:outputPanel rendered="{!r_classes}">
+                    <font Style="color:#700000;" face="Arial"><b>Apex Class Information:</b></font>
+                    <table Class="gridtable" cellpadding="0" cellspacing="0" style="width: 100%">
+                        <tr>
+                            <th  align="center">Name</th>
+                            <th  align="center">Namespace Prefix</th>
+                            <th  align="center">Api Version</th>                    
+                            <th  align="center">Size Without Comments</th>
+                            <th  align="center">Status</th>
+                            <th  align="center">Is Valid</th>
+                            <th  align="center">Last Modified Date</th>
+                            <th  align="center">Last Modified By</th>
+                            <th  align="center">Created Date</th>
+                            <th  align="center">Created By</th>
+                        </tr>
+                        
+                        <apex:repeat value="{!classList}" var="cl">
+                            <tr>
+                                <td> <apex:outputLink value="/{!cl.id}" target="_blank"> {!cl.name}</apex:outputLink> </td>
+                                <td>{!cl.NamespacePrefix}</td>
+                                <td>{!cl.ApiVersion}</td>
+                                <td>
+                                {!IF((cl.LengthWithoutComments==-1),"-",cl.LengthWithoutComments)} 
+                                </td>   
+                                <td>{!cl.status}</td>
+                                <td>{!cl.IsValid}</td>
+                                <td>{!cl.lastmodifieddate}</td>
+                                <td>{!cl.lastmodifiedby.name}</td>
+                                <td>{!cl.createdDate}</td>
+                                 <td>{!cl.createdby.name}</td>
+                            </tr>
+                        </apex:repeat>                           
+                    </table><br/><br/>
+                </apex:outputPanel>             
+            
+             <apex:outputPanel rendered="{!r_apexComponents}">
+                <font Style="color:#700000;" face="Arial"><b>Apex Component Information:</b></font><br/>
+                <table Class="gridtable" width="100%" cellpadding="0" cellspacing="0" >
+                    <tr>
+                        <th>Name</th>
+                        <th>Namespace Prefix</th>                                        
+                        <th>Api Version</th>
+                        <th>Master Label</th>
+                        <th>Last Modified Date</th>
+                        <th>Last Modified By</th>
+                        <th  align="center">Created Date</th>
+                        <th  align="center">Created By</th>
+                        <th>Description</th> 
+                    </tr>
+                    
+                    <apex:repeat value="{!apexComponentList}" var="ap">
+                        <tr>
+                            <td> <apex:outputLink value="/{!ap.id}" target="_blank"> {!ap.name}</apex:outputLink> </td> 
+                            <td>{!ap.NamespacePrefix}</td>                    
+                            <td>{!ap.ApiVersion}</td>
+                            <td>{!ap.MasterLabel}</td>
+                            <td>{!ap.lastModifiedDate}</td>
+                            <td>{!ap.lastmodifiedby.name}</td>
+                            <td>{!ap.createddate}</td>
+                            <td>{!ap.createdby.name}</td>
+                            <td>{!ap.description}</td>
+                            
+                        </tr>
+                    </apex:repeat>                           
+                </table><br/><br/>               
+            </apex:outputPanel>
+            
+
+             <apex:outputPanel rendered="{!r_approvalProcesses}">
+                <font Style="color:#700000;" face="Arial"><b>Approval Processes Information:</b></font>        
+                <table Class="gridtable" width="100%"  cellpadding="0" cellspacing="0" >
+                    <tr>
+                        <th align="center">Name</th>
+                        <th align="center">Object</th>
+                        <th align="center">Description</th>
+                    </tr> 
+                    <apex:repeat value="{!approvalProcs}" var="ap">                                   
+                        <tr>
+                            <td> <apex:outputLink value="/{!ap.id}" target="_blank"> {!ap.name}</apex:outputLink> </td> 
+                            <td>{!ap.objectName}</td>                        
+                            <td>{!ap.description}</td>
+                        </tr>
+                    </apex:repeat>                          
+                </table><br/><br/>        
+            </apex:outputPanel>
+            
+            
+            <apex:outputPanel rendered="{!r_Apexjob}">                   
+                <font Style="color:#700000;" face="Arial"><b>Async Apex Job Information:</b></font><br/>
+                <table Class="gridtable"  width="100%" cellpadding="0" cellspacing="0" >
+                    <tr>
+                        <th>Apex Class Name</th>
+                        <th>Completed Date</th>                                        
+                        <th>Extended Status</th>
+                        <th>Job Items Processed</th>
+                        <th>Job Type</th>
+                        <th>Method Name</th>
+                        <th>Number Of Errors</th>
+                        <th>Status</th>
+                        <th>Total Job Items</th>
+                        <th>Created Date</th>
+                        <th>Created By</th>
+                    </tr>
+                    
+                    <apex:repeat value="{!ApexjobList}" var="ajl">
+                        <tr>
+                            <td> <apex:outputLink value="/{!ajl.ApexClassID}" target="_blank"> {!ajl.ApexClass.Name}</apex:outputLink> </td> 
+                            <td>{!ajl.CompletedDate}</td>                    
+                            <td>{!ajl.ExtendedStatus}</td>
+                            <td>{!ajl.JobItemsProcessed}</td>
+                            <td>{!ajl.JobType}</td>
+                            <td>{!ajl.MethodName}</td>
+                            <td>{!ajl.NumberOfErrors}</td>
+                            <td>{!ajl.Status}</td>                    
+                            <td>{!ajl.TotalJobItems}</td>
+                            <td>{!ajl.createddate}</td>                    
+                            <td>{!ajl.createdby.Name}</td>
+                        </tr>
+                    </apex:repeat>                           
+                </table><br/><br/>
+            </apex:outputPanel> 
+            
+            <apex:outputPanel rendered="{!r_standardObjFields}">
+                <font Style="color:#700000;" face="Arial"><b><u>Standard Objects and Fields:</u></b></font>
+                    <apex:repeat value="{!StdObjectsndFieldsList}" var="stdobj">
+                    <h3>{!stdobj.sobj}</h3>                  
+                        <table Class="gridtable" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <th>Field Label</th>
+                                <th>Field API name</th>
+                                <th>Type</th>
+                                <th>Help Text</th>
+                            </tr>
+                            <apex:repeat value="{!stdobj.customFields}" var="cf">
+                                <tr>
+                                    <td>{!cf.label}</td>
+                                    <td>{!cf.apiName}</td>
+                                    <td> {!cf.type}
+                                        <!--<apex:outputText value="{!f.type}"/> &nbsp;
+                                        <apex:outputText value=" {!stype[f.name]}" />  -->
+                                    </td>
+                                    <td>{!cf.helpText}</td>
+                                </tr>
+                            </apex:repeat>                           
+                        </table><br/>                                                     
+                    </apex:repeat>                    
+                <br/>
+            </apex:outputPanel> 
+            
+             <apex:outputPanel rendered="{!r_customObjectsAndFields}">
+                <font Style="color:#700000;" face="Arial"><u><b>Custom Objects and Fields Information:</b></u></font>
+                    <apex:repeat value="{!ObjectNFieldWrapperList}" var="o">
+                    <h3>{!o.sobj}</h3>                  
+                        <table Class="gridtable" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <th>Field Label</th>
+                                <th>Field API name</th>
+                                <th>Type</th>
+                                <th>Help Text</th>
+                            </tr>
+                            <apex:repeat value="{!o.FieldResult}" var="f">
+                                <tr>
+                                    <td>{!f.label}</td>
+                                    <td>{!f.LocalName}</td>
+                                    <td>
+                                        <apex:outputText value="{!f.type}"/> &nbsp;
+                                        <apex:outputText value=" {!stype[f.name]}" /> 
+                                    </td>
+                                    <td>{!f.inlineHelpText}</td>
+                                </tr>
+                            </apex:repeat>
+                            
+                        </table><br/>                                                     
+                    </apex:repeat>                    
+                <br/>
+            </apex:outputPanel>   
+            
+            <apex:outputPanel rendered="{!r_dashboard}">
+                <font Style="color:#700000;" face="Arial"><b>DashBoard Information:</b></font>
+                <table Class="gridtable" width="100%"  cellpadding="0" cellspacing="0" >
+                    <tr>                    
+                        <th>Name</th>                                        
+                        <th>Is Deleted</th>
+                        <th>Folder Name</th>
+                        <th>Text Color</th>                 
+                        <th>Title Color</th>                                      
+                        <th>Type</th>                                    
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Last Modified By</th>
+                        <th>Last Modified Date</th>
+                        <th>Created Date</th>
+                        <th>Created By</th>
+                    </tr>
+                    
+                    <apex:repeat value="{!dashList}" var="dsList">
+                        <tr>                  
+                            <td> <apex:outputLink value="/{!dsList.id}" target="_blank"> {!dsList.DeveloperName}</apex:outputLink> </td> 
+                            <td>{!dsList.IsDeleted}</td>
+                            <td>{!dsList.Folder.Name}</td>
+                            <td>{!dsList.TextColor}</td>                    
+                            <td>{!dsList.TitleColor}</td>                    
+                            <td>{!dsList.Type}</td>           
+                            <td>{!dsList.Title}</td>
+                            <td>{!dsList.Description}</td>
+                            <td>{!dsList.lastmodifiedby.name}</td>
+                            <td>{!dsList.lastModifiedDate}</td>
+                            <td>{!dsList.createdby.name}</td>
+                            <td>{!dsList.createdDate}</td>
+                        </tr>
+                    </apex:repeat>                           
+                </table><br/><br/>
+            </apex:outputPanel>
+            
+            
+             <apex:outputPanel rendered="{!r_emailTemplate}">                   
+                <font Style="color:#700000;" face="Arial"><b>Email Template Information:</b></font><br/>
+                <table Class="gridtable"  width="100%" cellpadding="0" cellspacing="0" >
+                    <tr>
+                        <th>Template Name</th>
+                        <th>Subject</th>                                        
+                        <th>Is Active</th>
+                        <th>Description</th>
+                        <th>Owner Name</th>
+                        <th>Last Modified Date</th>
+                        <th>Last Modified By</th>
+                        <th>Created Date</th>
+                        <th>Created By</th>
+                    </tr>
+                    
+                    <apex:repeat value="{!eTemplateList}" var="eTemp">
+                        <tr>
+                            <td><apex:outputLink value="/{!eTemp.id}" target="_blank">{!eTemp.name}</apex:outputLink></td> 
+                            <td>{!eTemp.Subject}</td>                    
+                            <td>{!eTemp.IsActive}</td>
+                            <td>{!eTemp.Description}</td>    
+                            <td>{!eTemp.Owner.name}</td>
+                            <td>{!eTemp.lastModifiedDate}</td>
+                            <td>{!eTemp.lastmodifiedby.name}</td>
+                            <td>{!eTemp.createdDate}</td>
+                            <td>{!eTemp.createdby.name}</td>
+                         </tr>
+                    </apex:repeat>                           
+                </table><br/><br/>
+            </apex:outputPanel>
+            
+            
+            
+            <apex:outputPanel rendered="{!r_templates}">
+                <font Style="color:#700000;" face="Arial"><b>Mail Merge Template List Information:</b></font> 
+                <table Class="gridtable"  width="100%" cellpadding="0" cellspacing="0" >
+                    <tr>
+                        <th align="center">Name</th>
+                        <th align="center">File Name</th>
+                        <th align="center">Body Length</th>                    
+                        <th align="center">Is Deleted</th>
+                        <th align="center">Last Used Date</th>
+                        <th  align="center">Last Modified Date</th>
+                        <th  align="center">Last Modified By</th>
+                        <th  align="center"> Created Date</th>
+                        <th  align="center">Created By</th>
+                        <th  align="center">Description</th>
+                    </tr>
+                    
+                    <apex:repeat value="{!MailmergeTemplateList}" var="mt">
+                        <tr>
+                            <td> <apex:outputLink value="/{!mt.id}" target="_blank"> {!mt.name}</apex:outputLink> </td> 
+                            <td>{!mt.FileName}</td>
+                            <td>{!mt.BodyLength}</td>                    
+                            <td>{!mt.IsDeleted}</td>
+                            <td>{!mt.LastUsedDate}</td>
+                            <td>{!mt.lastModifiedDate}</td>
+                            <td>{!mt.lastmodifiedby.name}</td>
+                            <td>{!mt.createdDate}</td>
+                            <td>{!mt.createdby.name}</td>
+                            <td>{!mt.description}</td>
+                        </tr>
+                    </apex:repeat>                           
+                </table><br/><br/>
+            </apex:outputPanel>
+            
+            
+             <apex:outputPanel rendered="{!r_objPermissions}">               
+                <font Style="color:#700000;" face="Arial"><b>Object Permission Information:</b></font> 
+                <table Class="gridtable"  width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th align="center">Sobject Type</th>
+                        <th align="center">Permission Set Owned by Profile</th>
+                        <th align="center">Permissions Create</th>
+                        <th align="center">Permissions Edit</th>
+                        <th align="center">Permissions Modify All Records</th>
+                        <th align="center">Permissions Read</th>
+                        <th align="center">Permissions View All Records</th>
+                        <th align="center">Permissions Delete</th>
+                        <th  align="center">Last Modified Date</th>  
+                        <th  align="center">Last Modified By</th> 
+                        <th  align="center">Created Date</th>  
+                        <th  align="center">Created By</th>                   
+                    </tr>
+                    
+                    <apex:repeat value="{!objectPermissionsList}" var="opl">
+                        <tr>
+                            <td>{!opl.SobjectType}</td> 
+                            <td>{!opl.parent.Profile.Name}</td>
+                            <td>{!opl.PermissionsCreate}</td>
+                            <td>{!opl.PermissionsEdit}</td>
+                            <td>{!opl.PermissionsModifyAllRecords}</td>
+                            <td>{!opl.PermissionsRead}</td>
+                            <td>{!opl.PermissionsViewAllRecords}</td>
+                            <td>{!opl.PermissionsDelete}</td>
+                            <td>{!opl.lastModifiedDate}</td>
+                            <td>{!opl.lastmodifiedby.name}</td>
+                            <td>{!opl.createdDate}</td>
+                            <td>{!opl.createdby.name}</td>
+                        </tr>
+                    </apex:repeat>                           
+                </table><br/><br/>
+            </apex:outputPanel>  
+            
+             <apex:outputPanel rendered="{!r_orgInfo}">
+                <font Style="color:#700000;" face="Arial"><b>Organization Information:</b></font>       
+                <table Class="gridtable" width="100%"  cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th align="center">Name</th>
+                        <th align="center">Country</th>
+                        <th align="center">State</th>
+                        <th align="center">City</th>
+                        <th align="center">Street</th>
+                        <th align="center">Division</th>               
+                        <th align="center">Phone</th>
+                        <th align="center">Fax</th>
+                        <th align="center">Fiscal Year Start Month</th>
+                        <th align="center">Language Locale Key</th>
+                        <th align="center">Organization Type</th>             
+                        <th align="center">Postal Code</th>
+                        <th align="center">Primary Contact</th>
+                        <th  align="center">Last Modified Date</th>
+                        <th  align="center">Last Modified By</th>
+                        <th  align="center">Created Date</th>
+                        <th  align="center">Created By</th>                                                
+                    </tr> 
+                    <apex:repeat value="{!orgList}" var="org">                                   
+                        <tr>
+                            <td> <apex:outputLink value="/{!org.id}" target="_blank"> {!org.name}</apex:outputLink> </td> 
+                            <!--  <td>{!org.Name}</td> -->
+                            <td>{!org.Country}</td>
+                            <td>{!org.State}</td>
+                            <td>{!org.City}</td>
+                            <td>{!org.Street}</td>
+                            <td>{!org.Division}</td>                
+                            <td>{!org.Phone}</td>
+                            <td>{!org.Fax}</td>
+                            <td>{!org.FiscalYearStartMonth}</td>
+                            <td>{!org.LanguageLocaleKey}</td>
+                            <td>{!org.OrganizationType}</td>              
+                            <td>{!org.PostalCode}</td>
+                            <td>{!org.PrimaryContact}</td> 
+                            <td>{!org.lastModifiedDate}</td>
+                            <td>{!org.lastmodifiedby.name}</td>
+                            <td>{!org.createdDate}</td>
+                            <td>{!org.createdby.name}</td>
+                        </tr>
+                    </apex:repeat>                                                
+                </table><br/><br/>        
+            </apex:outputPanel>
+            
+            <apex:outputPanel rendered="{!r_profiles}">
+                <font Style="color:#700000;" face="Arial"><b>Profile Information:</b></font><br/>        
+                <table Class="gridtable" width="100%"  cellpadding="0" cellspacing="0" >
+                    <tr>
+                        <th align="center">Profile</th>
+                        <th align="center">User Type </th>                
+                        <th align="center">User License Name</th>
+                        <th align="center">Description</th>
+                        <th align="center">Last Modified Date</th>
+                        <th align="center">Last Modified By</th>
+                        <th align="center">Created Date</th>
+                        <th align="center">Created By</th>
+                    </tr> 
+                    <apex:repeat value="{!prfl}" var="p">                                   
+                        <tr>
+                            <td> <apex:outputLink value="/{!p.id}" target="_blank"> {!p.name}</apex:outputLink> </td> 
+                            <td>{!p.UserType} </td>
+                            <td>{!p.UserLicense.Name} </td>                
+                            <td>{!p.Description} </td>
+                            <td>{!p.lastModifiedDate} </td>
+                            <td>{!p.lastmodifiedby.name} </td>
+                            <td>{!p.createdDate} </td>
+                            <td>{!p.createdby.name} </td>
+                        </tr>
+                    </apex:repeat>                                                
+                </table> <br/><br/>       
+            </apex:outputPanel>
+     
+            <apex:outputPanel rendered="{!r_queues}">
+                <font Style="color:#700000;" face="Arial"><b>Queue Information:</b></font><br/>        
+                <table Class="gridtable" width="100%"  cellpadding="0" cellspacing="0" >
+                    <tr>
+                        <th align="center">Name</th>
+                        <th align="center">Send Email to Members</th>
+                        <th align="center">Email</th>
+                        <th align="center">Supported Objects</th>                                                
+                    </tr> 
+                    <apex:repeat value="{!queueList}" var="queue">                                   
+                        <tr>
+                            <td> <apex:outputLink value="/{!queue.qid}" target="_blank"> {!queue.name}</apex:outputLink> </td> 
+                            <td>{!queue.sendEmailToMembers}</td>                        
+                            <td>{!queue.email}</td>
+                            <td>{!queue.SObjects}</td>
+                        </tr>
+                    </apex:repeat>                          
+                </table><br/><br/>        
+            </apex:outputPanel>
+            
+            <apex:outputpanel rendered="{!AND(r_recordTypes,isRecTypeExist)}">
+                <font Style="color:#700000;" face="Arial"><b>Record Types Information:</b></font><br/>
+                <table  Class="gridtable" width="100%"  cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th align="center">Name</th>
+                        <th align="center">Sobject Type</th>
+                        <th align="center">Is Active</th>
+                        <th align="center">Description</th>
+                        <th align="center">Last Modified Date</th>
+                        <th align="center">Last Modified By</th>
+                        <th align="center">Created Date</th>
+                        <th align="center">Created By</th>
+                    </tr>
+                    <apex:repeat value="{!rec}" var="recr">
+                        <tr>
+                            <td> {!recr['name']}</td>
+                            <td>{!recr['SobjectType']}</td>
+                            <td>{!recr['IsActive']}</td>
+                            <td>{!recr['Description']}</td>
+                            <td>{!recr['lastModifiedDate']}</td>
+                            <td>{!recr['lastmodifiedby.name']}</td>
+                            <td>{!recr['createdDate']}</td>
+                            <td>{!recr['createdby.name']}</td>
+                        </tr>
+                    </apex:repeat>                                                
+                </table><br/><br/>
+            </apex:outputPanel>
+            
+            
+             <apex:outputPanel rendered="{!r_reports}">
+                <font Style="color:#700000;" face="Arial"><b>Report Information:</b></font><br/>
+                <table Class="gridtable" width="100%"  cellpadding="0" cellspacing="0" >
+                    <tr>
+                        <th align="center">Name</th>
+                        <th align="center">Report Unique Name</th>                                        
+                        <th align="center">Is Deleted</th>
+                        <th align="center">Last Run Date</th>
+                        <th align="center">Last Modified Date</th>
+                        <th align="center">Last Modified By</th>
+                        <th align="center">Created Date</th>
+                        <th align="center">Created By</th>
+                        <th align="center">Description</th>
+                    </tr>
+                    
+                    <apex:repeat value="{!reportList}" var="repList">
+                        <tr>
+                            <td> <apex:outputLink value="/{!repList.id}" target="_blank"> {!repList.name}</apex:outputLink> </td> 
+                            <td>{!repList.DeveloperName}</td>                    
+                            <td>{!repList.IsDeleted}</td>
+                            <td>{!repList.LastRunDate}</td>
+                            <td>{!repList.lastModifiedDate}</td>
+                            <td>{!repList.lastmodifiedby.name}</td>
+                            <td>{!repList.createddate}</td>
+                            <td>{!repList.createdby.name}</td>
+                            <td>{!repList.Description}</td>
+                        </tr>
+                    </apex:repeat>                           
+                </table><br/><br/>
+            </apex:outputPanel>
+            
+            <apex:outputPanel rendered="{!r_staticResources}">                   
+                <font Style="color:#700000;" face="Arial"><b>Static Resources Information:</b></font><br/>
+                <apex:outputPanel rendered="{!ccField}">
+                    <table Class="gridtable"  width="100%" cellpadding="0" cellspacing="0" >
+                        <tr>
+                            <th align="center">Name</th>
+                            <th align="center">Namespace Prefix</th>                                        
+                            <th align="center">Content Type</th>
+                            <th align="center">Cache Control</th>
+                            <th align="center">Body Length</th>
+                            <th  align="center">Last Modified Date</th>
+                            <th align="center">Last Modified By</th>
+                             <th  align="center">Created Date</th>
+                            <th align="center">Created By</th>
+                            <th align="center">Description</th>
+                           
+                        </tr>                       
+                        <apex:repeat value="{!staticResourceList}" var="sr">
+                            <tr>
+                                <td> <apex:outputLink value="/{!sr.id}" target="_blank"> {!sr.name}</apex:outputLink> </td> 
+                                <td>{!sr.NamespacePrefix}</td>                    
+                                <td>{!sr.ContentType}</td>
+                                <td>{!sr['CacheControl']}</td>
+                                <td>{!sr.BodyLength}</td> 
+                                <td>{!sr.lastModifiedDate}</td>
+                                <td>{!sr.lastmodifiedby.name}</td> 
+                                <td>{!sr.createdDate}</td>
+                                <td>{!sr.createdby.name}</td> 
+                                <td>{!sr.description}</td>                 
+                            </tr>
+                        </apex:repeat>                           
+                    </table>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!!ccField}">
+                    <table Class="gridtable"  width="100%" cellpadding="0" cellspacing="0" >
+                        <tr>
+                            <th align="center">Name</th>
+                            <th align="center">Namespace Prefix</th>                                        
+                            <th align="center">Content Type</th>
+                            <th align="center">Body Length</th>
+                            <th  align="center">Last Modified Date</th>
+                            <th align="center">Last Modified By</th>
+                             <th  align="center">Created Date</th>
+                            <th align="center">Created By</th>
+                            <th align="center">Description</th>
+                        </tr>                       
+                        <apex:repeat value="{!staticResourceList}" var="sr">
+                            <tr>
+                                <td> <apex:outputLink value="/{!sr.id}" target="_blank"> {!sr.name}</apex:outputLink> </td> 
+                                <td>{!sr.NamespacePrefix}</td>                    
+                                <td>{!sr.ContentType}</td>
+                                <td>{!sr.BodyLength}</td>
+                                <td>{!sr.lastModifiedDate}</td>
+                                <td>{!sr.lastmodifiedby.name}</td> 
+                                <td>{!sr.createdDate}</td>
+                                <td>{!sr.createdby.name}</td> 
+                                <td>{!sr.description}</td>                    
+                            </tr>
+                        </apex:repeat>                           
+                    </table>
+                </apex:outputPanel>
+                <br/><br/>
+            </apex:outputPanel>  
+                      
+            <apex:outputPanel rendered="{!r_triggers}">   
+                    <font Style="color:#700000;" face="Arial"><b>Trigger Information:</b></font><br/>
+                    <table Class="gridtable" width="100%" cellpadding="0" cellspacing="0" >
+                        <tr>
+                            <th  align="center">Name</th>
+                            <th  align="center">Api Version</th>                    
+                            <th  align="center">Length Without Comments</th>
+                            <th  align="center">Is Valid</th>
+                            <th  align="center">Status</th>
+                            <th  align="center">Usage After Delete</th>
+                            <th  align="center">Usage After Insert</th>
+                            <th  align="center">Usage After Undelete</th>
+                            <th  align="center">Usage After Update</th>
+                            <th  align="center">Usage Before Delete</th>
+                            <th  align="center">Usage Before Insert</th>
+                            <th  align="center">Usage Before Update</th>
+                            <th  align="center">Usage Is Bulk</th>
+                             <th  align="center">Last Modified Date</th>
+                            <th  align="center">Last Modified By</th>
+                            <th  align="center">Created Date</th>
+                            <th  align="center">Created By</th>                     
+                        </tr>
+                        <apex:repeat value="{!triggerList}" var="tr">
+                            <tr>
+                                <td> <apex:outputLink value="/{!tr.id}" target="_blank"> {!tr.name}</apex:outputLink> </td>
+                                <td>{!tr.ApiVersion}</td>                    
+                                <td>{!IF((tr.LengthWithoutComments==-1),"-",tr.LengthWithoutComments)} </td>
+                                <td>{!tr.IsValid}</td>
+                                <td>{!tr.Status}</td>
+                                <td>{!tr.UsageAfterDelete}</td>
+                                <td>{!tr.UsageAfterInsert}</td>
+                                <td>{!tr.UsageAfterUndelete}</td>
+                                <td>{!tr.UsageAfterUpdate}</td>
+                                <td>{!tr.UsageBeforeDelete}</td>
+                                <td>{!tr.UsageBeforeInsert}</td>
+                                <td>{!tr.UsageBeforeUpdate}</td>
+                                <td>{!tr.UsageIsBulk}</td>
+                                <td>{!tr.lastModifiedDate}</td>
+                                <td>{!tr.lastmodifiedby.name}</td>
+                                <td>{!tr.createdDate}</td>
+                                <td>{!tr.createdby.name}</td>
+                            </tr>
+                        </apex:repeat>                           
+                    </table><br/><br/>
+                </apex:outputPanel> 
+                
+                
+                <apex:outputPanel rendered="{!r_roles}">
+                <font Style="color:#700000;" face="Arial"><b>User Roles Information:</b></font><br/>        
+                <table Class="gridtable" width="100%"  cellpadding="0" cellspacing="0" >
+                    <tr>
+                        <th align="center">Role</th>
+                        <th align="center">Reports To</th>
+                        <th align="center">Last Modified Date</th>
+                        <th align="center">Last Modified By</th>                
+                    </tr> 
+                    <apex:repeat value="{!userRolesList}" var="role">                                   
+                        <tr>
+                            <td> <apex:outputLink value="/{!role.id}" target="_blank"> {!role.name}</apex:outputLink> </td> 
+                            <td>{!role.reportsTo} </td>
+                            <td>{!role.lastModifiedDate}</td>
+                            <td>{!role.lastModifiedBy}</td>
+                        </tr>
+                    </apex:repeat>                                                
+                </table> <br/><br/> 
+            </apex:outputPanel>
+            
+                     
+                <apex:outputPanel rendered="{!r_users}">
+                    <font Style="color:#700000;"  face="Arial"><b>User Information:</b></font><br/>
+                    
+                    <table Class="gridtable" cellpadding="0" cellspacing="0" style="width:100%;">
+                        <tr>
+                            <th align="center">User</th>
+                            <th align="center">Email</th>
+                            <th align="center">Profile</th>
+                            <th align="center">Role</th>
+                            <th  align="center">Last Modified Date</th>
+                            <th  align="center">Last Modified By</th>
+                            <th  align="center">Created Date</th>
+                             <th  align="center">Created By</th>
+                        </tr>
+                        <apex:repeat value="{!userList}" var="u">
+                            <tr>
+                                <td> <apex:outputLink value="/{!u.id}" target="_blank"> {!u.name}</apex:outputLink> </td>
+                                <td>{!u.email}</td>
+                                <td>{!u.Profile.name}</td>
+                                <td>{!u.UserRole.name}</td>
+                                <td>{!u.lastModifiedDate}</td>
+                                <td>{!u.lastmodifiedby.name}</td>
+                                <td>{!u.createddate}</td>
+                                <td>{!u.createdby.name}</td>
+                            </tr>
+                        </apex:repeat>                                                
+                    </table>
+                    
+                    <br/><br/>
+                </apex:outputPanel>
+                
+                         
+                <apex:outputPanel rendered="{!r_validationRules}">
+                    <font Style="color:#700000;" face="Arial"><b>Validation Rules:</b></font><br/>
+                    <table Class="gridtable" width="100%" cellpadding="0" cellspacing="0" >
+                        <tr>
+                            <th  align="center">Name</th>
+                            <th  align="center">Namespace Prefix</th>
+                            <th  align="center">Table Enum or Id</th>                    
+                            <th  align="center">Active</th>
+                            <th  align="center">Last Modified Date</th>
+                            <th  align="center">Last Modified By</th>
+                        </tr>
+                        
+                        <apex:repeat value="{!vruleList}" var="valRule"> <!--Validation rule -->
+                            <tr>
+                                <td><apex:outputLink value="/{!valRule.id}" target="_blank">{!valRule.validationName}</apex:outputLink></td>
+                                <td>{!valRule.namespacePrefix}</td>                                        
+                                <td>{!valRule.tableEnumOrId}</td>
+                                <td>{!valRule.active}</td>
+                                <td>{!valRule.lastModifiedDate}</td>
+                                <td>{!valRule.lastModifiedBy}</td>
+                            </tr>
+                        </apex:repeat>                           
+                    </table><br/><br/>  
+                </apex:outputPanel>
+                
+                
+                <apex:outputPanel rendered="{!r_vfPages}"><br></br>
+                <font Style="color:#700000;" face="Arial"><b>Visualforce Page Information:</b></font><br/>
+                <table Class="gridtable" width="100%"  cellpadding="0" cellspacing="0" >
+                    <tr>
+                        <th style="background-color" align="center">Name</th>
+                        <th style="background-color" align="center">Api Version</th> 
+                        <th style="background-color" align="center">Namespace Prefix</th>                                                                              
+                        <th style="background-color" align="center">Controller Key</th>
+                        <th style="background-color" align="center">Description</th>
+                        <th style="background-color" align="center">Last Modified Date</th>
+                        <th style="background-color" align="center">Last Modified By</th>
+                        <th style="background-color" align="center">Created Date</th>
+                        <th style="background-color" align="center">Created By</th>
+                    </tr>
+                    
+                    <apex:repeat value="{!pageList}" var="vf">
+                        <tr>
+                            <td> <apex:outputLink value="/{!vf.id}" target="_blank"> {!vf.name}</apex:outputLink> </td>
+                            <td>{!vf.ApiVersion}</td>                    
+                            <td>{!vf.NamespacePrefix}</td>
+                            <td>{!vf.ControllerKey}</td>
+                            <td>{!vf.Description}</td>
+                            <td>{!vf.lastModifiedDate}</td>
+                            <td>{!vf.lastmodifiedby.name}</td>
+                            <td>{!vf.createdDate}</td>
+                            <td>{!vf.createdby.name}</td>
+                        </tr>
+                    </apex:repeat>                           
+                </table><br/><br/>
+            </apex:outputPanel>
+                
+                
+                
+                <apex:outputPanel rendered="{!r_workflows}">
+                    <font Style="color:#700000;" face="Arial"><b>Workflow Rules:</b></font>
+                    <table Class="gridtable" width="100%" cellpadding="0" cellspacing="0" >
+                        <tr>
+                            <th  align="center">Name</th>
+                            <th  align="center">Namespace Prefix</th>
+                            <th  align="center">Table Enum or Id</th>  
+                            <th  align="center">Active</th>                 
+                            <th  align="center">Last Modified Date</th>
+                        </tr>
+                        
+                        <apex:repeat value="{!wfList}" var="wf"> <!--Validation rule -->
+                            <tr>
+                                <!-- <td> <apex:outputLink value="/{!cl.id}" target="_blank"> {!cl.name}</apex:outputLink> </td> -->
+                                <td><apex:outputLink value="/{!wf.id}" target="_blank">{!wf.name}</apex:outputLink></td>
+                                <td>{!wf.namespacePrefix}</td>                                        
+                                <td>{!wf.tableEnumOrId}</td>
+                                <td>{!wf.active}</td>
+                                <td>{!wf.lastModifiedDate}</td>
+                            </tr>
+                        </apex:repeat>                           
+                    </table><br/><br/>   
+                </apex:outputPanel>                                
+                
+                <apex:outputPanel rendered="{!r_workflowFieldUpdates}">
+                    <font Style="color:#700000;" face="Arial"><b>Workflow Field Updates:</b></font>
+                    <table Class="gridtable" width="100%" cellpadding="0" cellspacing="0" >
+                        <tr>
+                            <th  align="center">Name</th>
+                            <th  align="center">Namespace Prefix</th>
+                            <th  align="center">Source Table</th>                    
+                        </tr>
+                        
+                        <apex:repeat value="{!wfFieldupdates}" var="wfu"> 
+                            <tr>
+                                <td><apex:outputLink value="/{!wfu.id}" target="_blank">{!wfu.name}</apex:outputLink></td>
+                                <td>{!wfu.namespacePrefix}</td>                                        
+                                <td>{!wfu.sourcetable}</td>
+                            </tr>
+                        </apex:repeat>                           
+                    </table><br/><br/>   
+                </apex:outputPanel>
+
+
+            <!--########################################################################################################-->
+        </small>
+</body>
+</apex:page>

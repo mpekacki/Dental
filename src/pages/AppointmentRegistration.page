@@ -1,0 +1,240 @@
+<apex:page controller="AccountRemoter">
+	<apex:includeScript value="{! URLFOR($Resource.jQuery300)}"/>
+	<apex:includeScript value="{! URLFOR($Resource.jQueryUI, '/jquery-ui-1.11.4.custom/jquery-ui.min.js')}"/>
+	<apex:stylesheet value="{! URLFOR($Resource.jQueryUI, '/jquery-ui-1.11.4.custom/jquery-ui.min.css')}"/>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+
+	<script>
+		"use strict";
+		
+		var availableDates = [];
+		var selectedDentistID;
+		var selectedTime;
+		
+		function getDentists(callback) {
+			Visualforce.remoting.Manager.invokeAction(
+				'{!$RemoteAction.AccountRemoter.getDentists}',
+				callback
+			);
+		}
+		
+		function getDates(dentistId, callback) {
+			Visualforce.remoting.Manager.invokeAction(
+				'{!$RemoteAction.AccountRemoter.getAvailableDatesForDentist}',
+				dentistId,
+				callback
+			);
+		}
+		
+		function getTimes(dentistId, date, callback) {
+			Visualforce.remoting.Manager.invokeAction(
+				'{!$RemoteAction.AccountRemoter.getAvailableTimesForDentistAndDate}',
+				dentistId,
+				date,
+				callback
+			);
+		}
+
+		function getReservedSlot(token, callback) {
+			Visualforce.remoting.Manager.invokeAction(
+				'{!$RemoteAction.AccountRemoter.getReservedSlot}',
+				token,
+				callback
+			);
+		}
+		
+		function reserveTimeSlot(token, dentistId, dateTime, callback) {
+			Visualforce.remoting.Manager.invokeAction(
+				'{!$RemoteAction.AccountRemoter.reserveTimeSlot}',
+				token,
+				dentistId,
+				dateTime,
+				callback
+			);
+		}
+		
+		function registerAppointment(token, dentistId, dateTime, description, type, firstName, lastName, phone, email, callback) {
+			Visualforce.remoting.Manager.invokeAction(
+				'{!$RemoteAction.AccountRemoter.registerAppointment}',
+				token,
+				dentistId,
+				dateTime,
+				description, 
+				type, 
+				firstName, 
+				lastName, 
+				phone, 
+				email,
+				callback
+			);
+		}
+		
+		function submitDetails(event) {
+			
+			registerAppointment(
+				sessionStorage.token,
+				$('input[type=radio][name=dentist]:checked').val(), 
+				new Date($('input#appDate').val()).toUTCString(),
+				$('textarea[name=description]').val(),
+				$('input[name=type]').val(),
+				$('input[name=firstname]').val(),
+				$('input[name=lastname]').val(),
+				$('input[name=phone]').val(),
+				$('input[name=email]').val(),
+				function(result, event) {
+					if(event.status){
+						alert('Appointment successfully booked');
+					} else {
+						alert(event.message);
+					}
+				}
+			);
+			return false;
+		}
+		
+		$(document).ready(function() {
+		
+			if (sessionStorage.token == undefined) {
+				sessionStorage.token = null;
+			} else if (sessionStorage.token) {
+				getReservedSlot(sessionStorage.token, function(result, event) {
+					if(event.status){
+						if (result) {
+							selectedDentistID = result.Dentist__c;
+							selectedTime = new Date(result.Date_and_time_start__c);
+						}
+					} else {
+						alert(event.message);
+					}
+				});
+			}
+								
+			$('#appDate').datepicker({
+				dateFormat: 'yy-mm-dd',
+				beforeShowDay: function(date) {
+					for (var i = 0; i < availableDates.length; i++){
+						if (date.toDateString() == availableDates[i].toDateString()) {
+							return [true, ""];
+						}
+					}
+					return [false, "Unavailable"];
+				}
+			});
+		
+			$('#mainForm').submit(submitDetails);
+			$('#details').hide();
+			$('#desc').hide();
+			
+			$('#dates').hide();
+			
+			getDentists(function(result, event) {
+				if(event.status){
+					$.each(result, function(key, value) {
+						var option = $('<input>');
+						$(option).attr('type', 'radio');
+						$(option).attr('name', 'dentist');
+						$(option).val(value.Id);
+						
+						$('#dentists').append(option);
+						$('#dentists').append(value.Name);
+						$('#dentists').append('<br>');
+					});
+				} else {
+					alert(event.message);
+				}
+			});
+		});
+		
+		$(document).on('change', 'input[type=radio][name=dentist]', function() {
+			getDates($('input[type=radio][name=dentist]:checked').val(), function(result, event) {
+				if(event.status){
+					$.each(result, function(key, value) {
+						availableDates = [];
+						$('#times').html('');
+						$('input#appDate').val('');
+						$('#dates').show();
+						$('#details').hide();
+						
+						$.each(result, function(key, value) {
+							var d = new Date(value);
+							availableDates.push(d);
+						});
+
+						// if (selectedTime) {
+						// 	$('#appDate').val(moment(selectedTime.getTime()).format('yy-mm-dd'));
+						// }
+					});
+				} else {
+					alert(event.message);
+				}
+			});
+		});
+		
+		$(document).on('change', 'input#appDate', function() {
+			getTimes($('input[type=radio][name=dentist]:checked').val(), new Date($('input#appDate').val()).toUTCString(), function(result, event) {
+				if(event.status){
+					$('#times').html('');
+					$('#details').hide();
+					$.each(result, function(key, value) {
+						var d = new Date(value);
+						var option = $('<input>');
+						$(option).attr('type', 'radio');
+						$(option).attr('name', 'time');
+						$(option).val(d.toUTCString());
+						
+						$('#times').append(option);
+						$('#times').append(d.toLocaleTimeString());
+						$('#times').append('<br>');
+					});
+				} else {
+					alert(event.message);
+				}
+			});
+		});
+		
+		$(document).on('change', 'input[type=radio][name=time]', function() {
+			reserveTimeSlot(sessionStorage.token, $('input[type=radio][name=dentist]:checked').val(), $('input[type=radio][name=time]:checked').val(), function(result, event) {
+				if (event.status) {
+					sessionStorage.setItem('token', result);
+					$('#details').show();
+				} else {
+					alert(event.message);
+				}
+			});
+		});
+		
+		$(document).on('change', 'input[type=radio][name=type]', function() {
+			if($('input[type=radio][name=type]:checked').val() == 'Treatment'){
+				$('#desc').show();
+			} else {
+				$('#desc').hide();
+			}
+		});
+	</script>
+	<form id="mainForm">
+		<div id="dentists">
+			
+		</div>
+		<br/>
+		
+		<div id="dates">
+			Appointment date: <input id="appDate"></input>
+		</div>
+		<br/>
+		<div id="times">
+			
+		</div>
+		<br/>
+		<div id="details">
+			<input type="radio" name="type" value="Consultation">Consultation</input><br/>
+			<input type="radio" name="type" value="Treatment">Treatment</input><br/>
+			<span id="desc">Description: <textarea name="description"></textarea><br/></span>
+			First name: <input type="text" name="firstname"></input><br/>
+			Last name: <input type="text" name="lastname"></input><br/>
+			Phone: <input type="text" name="phone"></input><br/>
+			Email: <input type="email" name="email"></input><br/>
+			<input type="submit"></input>
+		</div>
+	</form>
+</apex:page>

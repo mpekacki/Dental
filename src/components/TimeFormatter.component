@@ -1,0 +1,6 @@
+<apex:component >
+    <apex:attribute name="time" type="Decimal" required="true" description="Time in 0000 format"/>
+    <apex:outputtext value="{0}">
+        <apex:param value="{!IF(time != null, LEFT(LPAD(TEXT(time),4,'0'),2) & ':' & RIGHT(LPAD(TEXT(time),4,'0'),2), '-')}"/>
+    </apex:outputtext>
+</apex:component>

@@ -1,0 +1,6 @@
+<apex:page standardController="Campsite__c">
+  <apex:form >
+      <apex:inputfield value="{!Campsite__c.Description__c}"/>
+      <apex:commandButton action="{!save}" value="Save"/>
+  </apex:form>
+</apex:page>

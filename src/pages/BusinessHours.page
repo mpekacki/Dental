@@ -1,0 +1,214 @@
+<apex:page controller="AvailableTimeController" title="Business hours">
+   <apex:sectionHeader title="Business hours for {!dentistName}"/>
+   <apex:includeScript value="{! URLFOR($Resource.jQuery300)}"/>
+  <style type="text/css">
+  
+  	.monthName {
+  		padding-left: 12px;
+  		padding-right: 18px;
+  	}
+  
+  	.calendar table {
+  		border: 1px solid black;
+  	}
+    	
+  	.calendar table, .calendar th, .calendar td {
+  		border-right: 1px solid gray;
+  		border-bottom: 1px solid gray;
+  		background-color: white;
+  	}
+  	
+  	.calendar th {
+  		font-size: larger;
+  		width: 90px;	
+  	}
+  	
+  	.calendar tbody tr {
+  		height: 80px;
+  	}
+  
+  	span.day.holiday {
+  		color: red !important;
+  	}
+  	
+  	span.custom {
+  		font-style: italic;
+  	}
+  	
+  	span.day {
+  		font-size: x-large;
+  	}
+  	
+  	td.old span.day {
+  		color: lightgray;
+  	}
+  	
+  	td.today {
+  		border-left: 3px solid orange;
+  	}
+  	
+  	td.old span.day.holiday {
+  		color: darksalmon !important;
+  	}
+  	
+  	.monthName {
+  		font-size: x-large;
+  		font-weight: bold;
+  	}
+
+    td.weekend {
+      background: #ffffb0;
+    }
+  </style>
+  
+  <script>
+
+  	function setTimeTo (timeFromId, timeToId) {
+      var timeFromIndex = $(document.getElementById(timeFromId)).prop('selectedIndex');
+      var timeToIndex = $(document.getElementById(timeToId)).prop('selectedIndex');
+
+      console.log(timeFromIndex, timeToIndex);
+
+      if (timeToIndex <= timeFromIndex && timeFromIndex < $(document.getElementById(timeFromId)).children('option').length - 1) {
+        $(document.getElementById(timeToId)).prop('selectedIndex', timeFromIndex + 1);
+      }
+  	}
+  	
+  	function setTimeFrom (timeFromId, timeToId) {
+      var timeFromIndex = $(document.getElementById(timeFromId)).prop('selectedIndex');
+      var timeToIndex = $(document.getElementById(timeToId)).prop('selectedIndex');
+
+      if (timeToIndex <= timeFromIndex && timeToIndex > 0) {
+        $(document.getElementById(timeFromId)).prop('selectedIndex', timeToIndex - 1);
+      }
+  	}
+
+    function colorWeekends() {
+      $('td:has(span.weekend)').addClass('weekend');
+    }
+
+    $(document).ready(function(){
+      colorWeekends();
+    });
+  </script>
+  
+ <apex:pageMessages ></apex:pageMessages>
+  
+ <table>
+ <tr>
+ <td colspan="2">
+ <apex:form >
+ 	<apex:pageBlock title="Add hours" id="add_hours">
+ 		<apex:pageBlockSection columns="1">
+ 		<apex:selectRadio value="{!selectedType}" label="For">
+ 			<apex:selectOption itemValue="Day" itemLabel="Day of week"> 				
+ 			</apex:selectOption>
+ 			<apex:selectOption itemValue="Date" itemLabel="Specific date"></apex:selectOption>
+ 			<apex:actionsupport rerender="add_hours" event="onchange"/>
+ 		</apex:selectRadio> 
+ 		<apex:inputField value="{!availableTime.Day_of_week__c}" rendered="{!selectedType == 'Day'}"></apex:inputField>		
+ 		<apex:inputField value="{!availableTime.Date__c}"  rendered="{!selectedType == 'Date'}"></apex:inputField>
+ 		 		<apex:inputcheckbox value="{!unavailableForTheDay}" rendered="{!selectedType == 'Date'}" label="Unavailable for the whole day">
+ 			<apex:actionsupport rerender="add_hours" event="onchange"/>
+ 		</apex:inputcheckbox>
+ 		<apex:selectList value="{!availableTime.TimeFrom__c}" size="1" label="Time from" id="time_from_form" onchange="setTimeTo('{!$Component.time_from_form}', '{!$Component.time_to_form}')" rendered="{!not(unavailableForTheDay)}">
+ 			<apex:selectOptions value="{!hours}"></apex:selectOptions>
+ 		</apex:selectList>
+ 		<apex:selectList value="{!availableTime.TimeTo__c}" size="1" label="Time to" id="time_to_form" onchange="setTimeFrom('{!$Component.time_from_form}', '{!$Component.time_to_form}')" rendered="{!not(unavailableForTheDay)}">
+ 			<apex:selectOptions value="{!hours}"></apex:selectOptions>
+ 		</apex:selectList>
+ 		<apex:commandButton action="{!save}" value="Add hours"></apex:commandButton>
+ 		</apex:pageBlockSection>
+ 	</apex:pageBlock>
+ 	</apex:form>
+ 	</td>
+ </tr>
+ <tr>
+ <td>
+    <apex:pageblock title="Default hours">
+    <apex:pageblockTable value="{!defaultHours}" var="h">
+    <apex:column headerValue="Action">
+            <apex:form >
+            <apex:commandLink action="{!deleteRecord}" onclick="if(!confirm('Are you sure?')){return false};">
+            Delete
+                <apex:param assignTo="{!selectedID}" value="{!h.Id}" name="id"/>
+            </apex:commandLink>
+            </apex:form>
+        </apex:column>
+        <apex:column value="{!h.Day_of_week__c}"/>
+        <apex:column headerValue="Time From">
+             <c:TimeFormatter time="{!h.TimeFrom__c}"/>
+        </apex:column>
+        <apex:column headerValue="Time To">
+             <c:TimeFormatter time="{!h.TimeTo__c}"/>
+        </apex:column>
+    </apex:pageblockTable>
+  </apex:pageblock>
+  </td>
+  
+  <td>
+  <apex:pageblock title="Custom hours">
+    <apex:pageblockTable value="{!customHours}" var="h">
+    <apex:column headerValue="Action">
+            <apex:form >
+            <apex:commandLink action="{!deleteRecord}" onclick="if(!confirm('Are you sure?')){return false};">
+            Delete
+                <apex:param assignTo="{!selectedID}" value="{!h.Id}" name="id"/>
+            </apex:commandLink>
+            </apex:form>
+        </apex:column>
+        <apex:column value="{!h.Date__c}"/>
+                <apex:column headerValue="Time From">
+            <c:TimeFormatter time="{!h.TimeFrom__c}"/>
+        </apex:column>
+        <apex:column headerValue="Time To">
+             <c:TimeFormatter time="{!h.TimeTo__c}"/>
+        </apex:column>
+        <apex:column headerValue="Info">
+        	<apex:outputtext value="{!IF(AND(h.TimeFrom__c == null, h.TimeTo__c == null), "Unavailable", "")}"></apex:outputtext>
+        </apex:column>
+    </apex:pageblockTable>
+  </apex:pageblock>
+    </td>
+  </tr>
+  <tr>
+  <td colspan="2">
+ 
+  <apex:pageblock title="Preview" id="monthPreview">
+  <apex:pageBlockButtons location="top">
+  <apex:form >
+  	  <apex:actionfunction action="{!decrementMonthView}" name="decMonthView" rerender="monthPreview" oncomplete="colorWeekends();">
+	  </apex:actionfunction>
+	  <apex:actionfunction action="{!incrementMonthView}" name="incMonthView" rerender="monthPreview" oncomplete="colorWeekends();">
+	  </apex:actionfunction>
+  	<a href="#monthPreview" onclick="decMonthView()">&lt; previous</a>
+  	<apex:outputText value="{0, date, MMMM yyyy}" styleClass="monthName">
+    		<apex:param value="{!monthViewDate}" /> 
+			</apex:outputText>
+  	<a href="#monthPreview" onclick="incMonthView()">next &gt;</a>
+  	</apex:form>
+  </apex:pageBlockButtons>
+  
+  <table class="calendar">
+  <thead>
+  <apex:repeat value="{!hoursPreview[0].days}" var="hd">
+  	<th>
+  		<apex:outputtext value="{!hd.dayName}"/>
+  	</th>
+  </apex:repeat>
+  </thead>
+    <apex:repeat value="{!hoursPreview}" var="h">
+    <tr>
+    	<apex:repeat value="{!h.days}" var="d">
+    	<td class="{!IF(d.d == TODAY(), 'today', '') + IF(MONTH(monthViewDate) != MONTH(d.d), ' old ', '') }">
+    			<c:CalendarColumn day="{!d}"/>
+    		</td>
+    	</apex:repeat>
+	</tr>
+    </apex:repeat>
+    </table>
+  </apex:pageblock>
+  </td>
+</tr>
+  </table>
+</apex:page>

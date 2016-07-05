@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Octopus</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <description>Get to know your Salesforce Instance using this app. The details can be downloaded as microsoft word and pdf files also.</description>
+    <namespacePrefix>astrea_oct</namespacePrefix>
+    <types>
+        <members>GetToolingApiObjects</members>
+        <members>GetToolingApiObjectsTest</members>
+        <members>SystemDetailsCtr</members>
+        <members>SystemDetailsCtrTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>overlay</members>
+        <name>ApexComponent</name>
+    </types>
+    <types>
+        <members>docTool</members>
+        <members>docToolIndex</members>
+        <members>docToolVf</members>
+        <members>docToolWord</members>
+        <name>ApexPage</name>
+    </types>
+    <types>
+        <members>Octopus</members>
+        <name>CustomApplication</name>
+    </types>
+    <types>
+        <members>Octopus</members>
+        <name>CustomTab</name>
+    </types>
+    <types>
+        <members>oct</members>
+        <members>pdfDocIcon</members>
+        <members>word</members>
+        <name>StaticResource</name>
+    </types>
+    <version>36.0</version>
+</Package>

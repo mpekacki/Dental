@@ -1,0 +1,92 @@
+@isTest(SeeAllData=true)
+private class TestREST {
+
+	@isTest
+    static List<DentistWithHours> testGetDentistsWithHours() {
+    	RestRequest request = new RestRequest();
+
+    	request.requestURI = 'https://eu6.salesforce.com/services/apexrest/DentistsWithHours/2016/7';
+    	request.httpMethod = 'GET';
+
+    	RestContext.request = request;
+
+        List<DentistWithHours> dwhs = RESTDentists.getDentistsAndHours();
+        Integer noOfDentists = [SELECT ID FROM Dentist__c].size();
+
+        System.debug(dwhs);
+        System.assertEquals(noOfDentists, dwhs.size());
+
+        return dwhs;
+    }
+
+    @isTest
+    static void testPostAppointment() {
+    	List<DentistWithHours> dwhs = testGetDentistsWithHours();
+
+        ID dentistId = dwhs[0].dentist.ID;
+        DateTime timeStart = TimeConverter.extractTimeFrom(dwhs[0].availableHours[0]);
+
+        String description = 'Aua';
+        String typeName = 'Treatment';
+        String firstName = 'Dexter';
+        String lastName = 'Morgan';
+        String phone = '444444';
+        String email = 'marcel.pekacki+dexter@gmail.com';
+
+    	Appointment__c app = RESTAppointment.registerAppointment(dentistId,
+												timeStart,
+												description,
+												typeName,
+												firstName,
+												lastName,
+												phone,
+												email); 
+        														
+        System.assertNotEquals(null, app.ID);
+        
+        Appointment__c insertedRecord = [SELECT ID, Dentist__c, Date_and_time_start__c, Date_and_time_end__c, Description__c, RecordType.Name, Contact__r.FirstName, Contact__r.LastName, Contact__r.Phone, Contact__r.Email
+         FROM Appointment__c 
+         WHERE ID = :app.ID LIMIT 1];
+         
+        System.assertEquals(dentistId, insertedRecord.Dentist__c);
+        System.assertEquals(timeStart, insertedRecord.Date_and_time_start__c);
+        System.assertEquals(timeStart.addMinutes(Constants.APPOINTMENT_TIME_IN_MINUTES), insertedRecord.Date_and_time_end__c);
+        System.assertEquals(description, insertedRecord.Description__c);
+        System.assertEquals(typeName, insertedRecord.RecordType.Name);
+        System.assertEquals(firstName, insertedRecord.Contact__r.FirstName);
+        System.assertEquals(lastName, insertedRecord.Contact__r.LastName);
+        System.assertEquals(phone, insertedRecord.Contact__r.Phone);
+        System.assertEquals(email, insertedRecord.Contact__r.Email);
+    }
+
+    @isTest
+    static void testRegisterOnTakenSlot() {
+    	List<DentistWithHours> dwhs = testGetDentistsWithHours();
+
+        ID dentistId = dwhs[0].dentist.ID;
+        DateTime timeStart = TimeConverter.extractTimeFrom(dwhs[0].availableHours[0]);
+
+        AccountRemoter.reserveTimeSlot(null, dentistId, timeStart);
+        
+        String description = 'Aua';
+        String typeName = 'Treatment';
+        String firstName = 'Dexter';
+        String lastName = 'Morgan';
+        String phone = '444444';
+        String email = 'marcel.pekacki+dexter@gmail.com';
+
+        try{
+        	RESTAppointment.registerAppointment(dentistId,
+												timeStart,
+												description,
+												typeName,
+												firstName,
+												lastName,
+												phone,
+												email); // should throw an exception
+        	System.assert(false); // should not reach here
+    	} catch (DmlException e) {
+    		System.assertEquals(StatusCode.FIELD_CUSTOM_VALIDATION_EXCEPTION, e.getDmlType(0));
+    	}
+    }
+}

@@ -1,0 +1,101 @@
+<apex:page controller="astrea_oct.SystemDetailsCtr" sidebar="false" readOnly="true">
+<html>
+<head>
+<c:overlay style="processing" />
+</head>
+
+<style>
+
+div.box {
+        width: 50%;
+        border: 1px solid black;
+        background: #e6fce8;
+        padding: 20px;
+        margin-left: 25%;
+        }                
+</style>
+
+<body>
+<apex:form > 
+<div Class="box">
+<div style="border:1px solid black">
+       <br/>
+       <b><center><font size="7" color="#8CB2E1" style="font-family: Georgia;font-size: 40px;">Octopus</font><apex:image url="{!$Resource.astrea_oct__oct}" width="60" height="49"/></center></b><center><h6>Get to know your Salesforce Instance</h6></center><br/><br/>                       
+        <div style="padding-left: 100px; padding-right: 100px;">
+            <apex:inputCheckbox value="{!isSelectAll}"> <apex:actionSupport event="onchange" action="{!selectAll}" reRender="options" status="overlayStatus"/> </apex:inputcheckbox>               
+            <span style="font-weight:bold;">Select All</span>
+            <hr/>
+            <apex:outputpanel id="options">
+            <apex:inputCheckbox value="{!r_classes}"/> Apex Classes <br/>
+            <apex:inputCheckbox value="{!r_apexComponents}"/> Apex Components <br/>
+            <apex:inputCheckbox value="{!r_approvalProcesses}"/> Approval Processes <br/>
+            <apex:inputCheckbox value="{!r_Apexjob}"/> Async Apex Job Information <br/>
+            <apex:inputCheckbox value="{!r_standardObjFields}"/> Standard Objects and Fields <br/>
+            <apex:inputCheckbox value="{!r_customObjectsAndFields}"/> Custom Objects and Fields <br/>            
+            <apex:inputCheckbox value="{!r_dashboard}"/> Dashboard Information <br/>
+            <apex:inputCheckbox value="{!r_emailTemplate}"/> Email Template Information <br/>
+            <apex:inputCheckbox value="{!r_templates}"/> Mail Merge Templates <br/>
+            <apex:inputCheckbox value="{!r_objPermissions}"/> Object Permission <br/>
+            <apex:inputCheckbox value="{!r_orgInfo}"/> Organisation <br/>
+            <apex:inputCheckbox value="{!r_profiles}"/> Profiles <br/>
+            <apex:inputCheckbox value="{!r_queues}"/> Queues <br/>
+            <apex:outputPanel rendered="{!isRecTypeExist}"> <apex:inputCheckbox value="{!r_recordTypes}"/> Record Types <br/> </apex:outputPanel>          
+            <apex:inputCheckbox value="{!r_reports}"/> Reports <br/>
+            <apex:inputCheckbox value="{!r_staticResources}"/> Static Resources <br/>
+            <apex:inputCheckbox value="{!r_triggers}"/> Triggers <br/>
+            <apex:inputCheckbox value="{!r_roles}"/> User Roles <br/>
+            <apex:inputCheckbox value="{!r_users}" /> Users <br/>
+            <apex:inputcheckbox value="{!r_validationRules}"/> Validation Rules <br/>
+            <apex:inputCheckbox value="{!r_vfPages}"/> VisualForce Pages <br/>
+            <apex:inputcheckbox value="{!r_workflows}"/> Workflow Rules <br/>
+            <apex:inputCheckbox value="{!r_workflowFieldUpdates}"/> Workflow Field Updates <br/>
+            </apex:outputpanel>       
+        <br/>
+        Maximum number of records to be displayed for each: &nbsp;
+        <apex:selectList value="{!chosenLimit}" size="1">
+            <apex:selectOptions value="{!limitOptions}"></apex:selectOptions>
+        </apex:selectList>
+        <br/><br/><br/>
+        </div>
+        <center>
+        <apex:actionStatus id="overlayStatus" onStart="showOverlay();" onstop="hideOverlay();"></apex:actionstatus>
+        
+        <table border="0">
+        <tr>
+        <td colspan="2">
+            <center>                
+                <apex:commandButton action="{!GenerateVfPageDoc}" value="View" style="width:80%"/>
+            </center>
+        </td>
+        <tr>
+        <td>&nbsp;</td><td>&nbsp;</td>
+        </tr>
+        </tr>
+        <tr><td colspan="2" style="text-align:center;">Download As</td></tr>
+        <tr>
+        <td>
+        <apex:commandbutton image="{!$Resource.astrea_oct__pdfDocIcon}" action="{!GenerateDoc}" style="bgcolor:white;background-image:url({!URLFOR($Resource.astrea_oct__pdfDocIcon,'pdf.png')});height:40px;width:40px;border-width:0px;background-repeat:no-repeat;cursor:pointer;"/> 
+        </td>
+            <td>
+            <apex:commandbutton image="{!$Resource.astrea_oct__word}" action="{!GenerateWordDoc}" style="bgcolor:white;background-image:url({!URLFOR($Resource.astrea_oct__word,'word.png')});height:40px;width:40px;border-width:0px;background-repeat:no-repeat;cursor:pointer;"/> 
+        </td>
+        </tr>        
+        </table>
+        <br/>
+        </center>
+        <!--<span style="padding-left:33px;"> <b>Note:  </b></span> <br/> -->
+        <p style="padding-left:25px; padding-right: 25px; text-align:center;">
+        If you are unable to view <b>Approval Processes/ Validation Rules/ Workflow Rules/ Workflow Field Updates</b>, please ensure that your salesforce instance URL has been added in the remote site settings. <br/>(Go to Setup> in Administer> Security Controls> Remote Site Settings)<br/>
+        For example, if your Salesforce instance is na12.salesforce.com remote site setting would be https://na12.salesforce.com <br/><br/>
+        Octopus can sometimes encounter <b>'Apex heap size too large'</b> error due to Salesforce governer limits, please deselect a few items or choose a lower picklist value to resolve the error.<br/>        
+        </p>
+        <br/><br/>
+     
+     </div> <!-- inner box-->
+     </div> <!--.box-->
+     <div id="overlay"></div>
+    </apex:form>
+      
+    </body>
+    </html>
+</apex:page>
