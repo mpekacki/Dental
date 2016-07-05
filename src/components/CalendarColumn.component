@@ -7,10 +7,7 @@
         </span><br/>
             <apex:repeat value="{!day.ranges}" var="r">
                 <span class="{!IF(day.custom == true, 'custom ', '') + 'range'}">
-                    <apex:outputtext value="{0} - {1}">
-                        <apex:param value="{!if(r.TimeFrom != null, left(lpad(text(r.TimeFrom),4,'0'),2) & ':' & right(lpad(text(r.TimeFrom),4,'0'),2), '')}"/>
-                        <apex:param value="{!if(r.TimeTo != null, left(lpad(text(r.TimeTo),4,'0'),2) & ':' & right(lpad(text(r.TimeTo),4,'0'),2), '')}"/>
-                    </apex:outputtext>
+                    <c:TimeFormatter time="{!r.TimeFrom}"/> - <c:TimeFormatter time="{!r.TimeTo}"/>
                 </span><br/>
             </apex:repeat>
   </apex:component>

@@ -1,32 +1,33 @@
 public class TimeConverter {
 	
 	public static final Timezone TZ = Timezone.getTimeZone(Constants.CLINIC_TIMEZONE);
-	    
-    public static Integer t24ToMinutes(Integer t24){
-    	return t24 / 100 * 60 + math.mod(t24, 100);
-    }
-    
-    public static Integer t24ToMinutes(Decimal t24) {
-    	return t24ToMinutes(math.round(t24));
-    }
-    
-    public static Integer minutesToT24(Integer minutes) {
-    	Integer hourPart = minutes / 60;
-    	Integer minPart = math.mod(minutes, 60);
-    	return hourPart * 100 + minPart;
+
+    public static String formatMinutes(Integer minutes) {
+        return leftPad(String.valueOf(minutes / 60), 2, '0')  + ':' + leftPad(String.valueOf(Math.mod(minutes, 60)), 2, '0');
     }
     
     public static DateTime extractTimeFrom(AvailableTime__c a) {
-    	return addT24ToDate(a.TimeFrom__c, a.Date__c, true);
+    	return addMinutesToDate(Math.round(a.TimeFrom__c), a.Date__c, true);
     }
     
     public static DateTime extractTimeTo(AvailableTime__c a) {
-    	return addT24ToDate(a.TimeTo__c, a.Date__c, true);
+    	return addMinutesToDate(Math.round(a.TimeTo__c), a.Date__c, true);
     }
     
-    private static DateTime addT24ToDate(Decimal t24, Date d, Boolean adjustForTZ) {
-    	Integer minutes = t24ToMinutes(t24);
+    private static DateTime addMinutesToDate(Integer minutes, Date d, Boolean adjustForTZ) {
     	DateTime dt = ((DateTime)d).addMinutes(minutes);
     	return DateTime.newInstance(dt.getTime() - (adjustForTZ ? TZ.getOffset(dt) : 0));
+    }
+
+    private static String leftPad(String str, Integer places, String padString) {
+        if (padString.length() != 1) {
+            return null;
+        }
+
+        Integer l = str.length();
+        for (Integer i = 0; i < places - l; i++) {
+            str = padString + str;
+        }
+        return str;
     }
 }

@@ -37,7 +37,7 @@ public with sharing class AvailableTimeController {
     }
     
     private void initNewRecord(){    
-        this.availableTime = new AvailableTime__c(Dentist__c = dentistID, TimeTo__c = 100);
+        this.availableTime = new AvailableTime__c(Dentist__c = dentistID, TimeTo__c = Constants.APPOINTMENT_TIME_IN_MINUTES);
     }
     
     public void save() {   	
@@ -80,31 +80,12 @@ public with sharing class AvailableTimeController {
     
     public List<SelectOption> getHours(){
         List<SelectOption> hours = new List<SelectOption>();
-        Integer i = 0;
-        while (i <= 2400) {
-        	hours.add(new SelectOption(String.valueOf(i), formatHours(i)));
-        	i += Constants.APPOINTMENT_TIME_IN_MINUTES;
-        	if (Math.mod(i, 100) >= 60) {
-        		i = (i / 100 + 1) * 100 + Math.mod(i, 100) - 60;
-        	}
+        
+        for (Integer i = 0; i <= 1440; i += Constants.APPOINTMENT_TIME_IN_MINUTES) {
+            hours.add(new SelectOption(String.valueOf(i), TimeConverter.formatMinutes(i)));
         }
 
         return hours;
-    }
-
-    
-    private String leftPad(Integer num, Integer places) {
-    	String str = String.valueOf(num);
-    	Integer l = str.length();
-    	for (Integer i = 0; i < places - l; i++) {
-    		str = '0' + str;
-    	}
-    	return str;
-    }
-    
-    private String formatHours(Integer num) {
-    	String str = leftPad(num, 4);
-    	return str.substring(0, 2) + ':' + str.substring(2, 4);
     }
     
 	public List<AvailableTime__c> getDefaultHours(){        

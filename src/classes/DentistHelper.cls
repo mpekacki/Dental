@@ -111,12 +111,12 @@ public with sharing class DentistHelper {
     	for (Integer iApp = 0; iApp < overlappingApps.size(); iApp++) {
     		Appointment__c app = overlappingApps[iApp];
     		Decimal beforeSlotFrom = a.TimeFrom__c;
-    		Decimal beforeSlotTo = app.Date_and_time_start__c.hour() * 100 + app.Date_and_time_start__c.minute();
+    		Decimal beforeSlotTo = app.Date_and_time_start__c.hour() * 60 + app.Date_and_time_start__c.minute();
     		
-    		Decimal afterSlotFrom = app.Date_and_time_end__c.hour() * 100 + app.Date_and_time_end__c.minute();
+    		Decimal afterSlotFrom = app.Date_and_time_end__c.hour() * 60 + app.Date_and_time_end__c.minute();
     		Decimal afterSlotTo = a.TimeTo__c;
             if (afterSlotFrom == 0) {
-                afterSlotFrom = 2400;
+                afterSlotFrom = 1440;
             }
     		
     		if(beforeSlotFrom < beforeSlotTo) {

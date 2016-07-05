@@ -15,7 +15,7 @@ private class TestAppointmentNoOverlapTrigger {
     static void testNoOverlap() {
     	ID dentistID = insertDentist();
     	
-    	AvailableTime__c a = new AvailableTime__c(Dentist__c = dentistID, TimeFrom__c = 1200, TimeTo__c = 1400, Date__c = Date.newInstance(2016, 5, 16));
+    	AvailableTime__c a = new AvailableTime__c(Dentist__c = dentistID, TimeFrom__c = 720, TimeTo__c = 840, Date__c = Date.newInstance(2016, 5, 16));
 		insert a;
 		
     	DateTime dateStart = DateTime.newInstance(2016, 5, 16, 12, 0, 0);
@@ -37,7 +37,7 @@ private class TestAppointmentNoOverlapTrigger {
     static void testOutsideTime() {
     	ID dentistID = insertDentist();
     	
-    	AvailableTime__c a = new AvailableTime__c(Dentist__c = dentistID, TimeFrom__c = 1200, TimeTo__c = 1400, Date__c = Date.newInstance(2016, 5, 16));
+    	AvailableTime__c a = new AvailableTime__c(Dentist__c = dentistID, TimeFrom__c = 720, TimeTo__c = 840, Date__c = Date.newInstance(2016, 5, 16));
 		insert a;
     	
     	DateTime dateStart = DateTime.newInstance(2016, 5, 16, 14, 0, 0);
@@ -59,7 +59,7 @@ private class TestAppointmentNoOverlapTrigger {
     	
     	Date d1 = Date.newInstance(2016, 5, 16);
     	
-    	AvailableTime__c a1 = new AvailableTime__c(Dentist__c = dentistID, TimeFrom__c = 1200, TimeTo__c = 1400, Date__c = d1);
+    	AvailableTime__c a1 = new AvailableTime__c(Dentist__c = dentistID, TimeFrom__c = 720, TimeTo__c = 840, Date__c = d1);
 
 		insert a1;
 		
@@ -78,7 +78,7 @@ private class TestAppointmentNoOverlapTrigger {
     	
     	String dow2 = ((DateTime)Date.newInstance(2016, 5, 17)).format('EEEE');
     	
-    	AvailableTime__c a2 = new AvailableTime__c(Dentist__c = dentistID, TimeFrom__c = 1500, TimeTo__c = 1600, Day_of_week__c = dow2);
+    	AvailableTime__c a2 = new AvailableTime__c(Dentist__c = dentistID, TimeFrom__c = 900, TimeTo__c = 960, Day_of_week__c = dow2);
     	
     	insert a2;
     	

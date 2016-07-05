@@ -5,15 +5,15 @@ private class TestAvailableTimeController {
     static void testCreateRecordDay() {
     	Dentist__c dentist = TestTools.createDentist(UserInfo.getUserID());
         AvailableTimeController ctr = new AvailableTimeController();
-        ctr.availableTime.TimeFrom__c = 1000;
-        ctr.availableTime.TimeTo__c = 1600;
+        ctr.availableTime.TimeFrom__c = 600;
+        ctr.availableTime.TimeTo__c = 960;
         ctr.availableTime.Day_of_week__c = 'Monday';
         
         ctr.save();
         
         AvailableTime__c inserted = [SELECT ID, TimeFrom__c, TimeTo__c, Day_of_week__c, Date__c FROM AvailableTime__c WHERE Dentist__c = :dentist.ID LIMIT 1];
-        System.assertEquals(1000, inserted.TimeFrom__c);
-        System.assertEquals(1600, inserted.TimeTo__c);
+        System.assertEquals(600, inserted.TimeFrom__c);
+        System.assertEquals(960, inserted.TimeTo__c);
         System.assertEquals('Monday', inserted.Day_of_week__c);
         System.assertEquals(null, inserted.Date__c);
     }
@@ -22,15 +22,15 @@ private class TestAvailableTimeController {
     static void testCreateRecordDate() {
     	Dentist__c dentist = TestTools.createDentist(UserInfo.getUserID());
         AvailableTimeController ctr = new AvailableTimeController();
-        ctr.availableTime.TimeFrom__c = 1000;
-        ctr.availableTime.TimeTo__c = 1600;
+        ctr.availableTime.TimeFrom__c = 600;
+        ctr.availableTime.TimeTo__c = 960;
         ctr.availableTime.Date__c = Date.today();
         
         ctr.save();
         
         AvailableTime__c inserted = [SELECT ID, TimeFrom__c, TimeTo__c, Day_of_week__c, Date__c FROM AvailableTime__c WHERE Dentist__c = :dentist.ID LIMIT 1];
-        System.assertEquals(1000, inserted.TimeFrom__c);
-        System.assertEquals(1600, inserted.TimeTo__c);
+        System.assertEquals(600, inserted.TimeFrom__c);
+        System.assertEquals(960, inserted.TimeTo__c);
         System.assertEquals(Date.today(), inserted.Date__c);
         System.assertEquals(null, inserted.Day_of_week__c);
     }
@@ -39,8 +39,8 @@ private class TestAvailableTimeController {
     static void testDeleteRecord() {
     	Dentist__c dentist = TestTools.createDentist(UserInfo.getUserID());
     	AvailableTimeController ctr = new AvailableTimeController();
-        ctr.availableTime.TimeFrom__c = 1000;
-        ctr.availableTime.TimeTo__c = 1600;
+        ctr.availableTime.TimeFrom__c = 600;
+        ctr.availableTime.TimeTo__c = 960;
         ctr.availableTime.Date__c = Date.today();
         
         ctr.save();

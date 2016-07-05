@@ -18,8 +18,8 @@ trigger AppointmentNoOverlapTrigger on Appointment__c (before insert, before upd
     		a.addError('There is another appointment that overlaps with this one.');
     	}
     	
-    	Decimal timeFrom = a.Date_and_time_start__c.hour() * 100 + a.Date_and_time_start__c.minute();
-    	Decimal timeTo = a.Date_and_time_end__c.hour() * 100 + a.Date_and_time_end__c.minute();
+    	Decimal timeFrom = a.Date_and_time_start__c.hour() * 60 + a.Date_and_time_start__c.minute();
+    	Decimal timeTo = a.Date_and_time_end__c.hour() * 60 + a.Date_and_time_end__c.minute();
     	String dayOfWeek = a.Date_and_time_start__c.format('EEEE');
     	
     	if([

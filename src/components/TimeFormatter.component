@@ -1,6 +1,6 @@
 <apex:component >
-    <apex:attribute name="time" type="Decimal" required="true" description="Time in 0000 format"/>
+    <apex:attribute name="time" type="Decimal" required="true" description="Time in minutes format"/>
     <apex:outputtext value="{0}">
-        <apex:param value="{!IF(time != null, LEFT(LPAD(TEXT(time),4,'0'),2) & ':' & RIGHT(LPAD(TEXT(time),4,'0'),2), '-')}"/>
+        <apex:param value="{!IF(time != null, LPAD(TEXT(time / 60), 2, '0') & ':' & LPAD(TEXT(MOD(time, 60)), 2, '0'), '-')}"/>
     </apex:outputtext>
 </apex:component>
