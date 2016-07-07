@@ -163,6 +163,31 @@ public with sharing class DentistHelper {
         
         return result;
     }
+
+    public DentistWithHours getDentistWithHours(Date dateFrom, Date dateTo) {
+        DentistWithHours dwh = new DentistWithHours();
+        dwh.dentist = [SELECT ID, Name, Speciality__c FROM Dentist__c WHERE ID = :dentistID LIMIT 1];
+
+        List<DateTime> possibleStartTimes = getPossibleAppointmentStartTimes(Constants.APPOINTMENT_TIME_IN_MINUTES, dateFrom, dateTo);
+
+        DayAvailability da;
+        for (DateTime dt : possibleStartTimes) {
+            if (da == null || dt.date() != da.day) {
+                da = new DayAvailability();
+                da.day = dt.date();
+                dwh.availableDays.add(da);
+            }
+
+            DayAvailability.HourRange hr = new DayAvailability.HourRange();
+            hr.timeFrom = TimeConverter.formatTime(dt);
+            DateTime dtEnd = dt.addMinutes(Constants.APPOINTMENT_TIME_IN_MINUTES);
+            hr.timeTo = TimeConverter.formatTime(dtEnd);
+
+            da.availableHours.add(hr);
+        }
+
+        return dwh;
+    }
     
     public List<DateTime> getPossibleAppointmentStartTimes(Integer appointmentLengthInMinutes, Date dateFrom, Date dateTo) {
     	List<DateTime> result = new List<DateTime>();

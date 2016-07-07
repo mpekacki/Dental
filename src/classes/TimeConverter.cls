@@ -5,6 +5,10 @@ public class TimeConverter {
     public static String formatMinutes(Integer minutes) {
         return leftPad(String.valueOf(minutes / 60), 2, '0')  + ':' + leftPad(String.valueOf(Math.mod(minutes, 60)), 2, '0');
     }
+
+    public static String formatTime(DateTime dt) {
+        return formatMinutes(dt.hour() * 60 + dt.minute());
+    }
     
     public static DateTime extractTimeFrom(AvailableTime__c a) {
     	return addMinutesToDate(Math.round(a.TimeFrom__c), a.Date__c, true);
@@ -12,6 +16,11 @@ public class TimeConverter {
     
     public static DateTime extractTimeTo(AvailableTime__c a) {
     	return addMinutesToDate(Math.round(a.TimeTo__c), a.Date__c, true);
+    }
+
+    public static DateTime addTimeToDate(String timeStr, Date d) {
+        Integer minutes = Integer.valueOf(timeStr.substring(0, 2)) * 60 + Integer.valueOf(timeStr.substring(3, 5));
+        return addMinutesToDate(minutes, d, true);
     }
     
     private static DateTime addMinutesToDate(Integer minutes, Date d, Boolean adjustForTZ) {

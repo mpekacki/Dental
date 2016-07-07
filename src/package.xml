@@ -5,6 +5,7 @@
         <members>AccountRemoter</members>
         <members>AppointmentListController</members>
         <members>AppointmentRegistrationController</members>
+        <members>AppointmentRegistrationSOAPWebService</members>
         <members>AvailableTimeController</members>
         <members>AvailableTimeEditController</members>
         <members>ChangePasswordController</members>
@@ -13,6 +14,7 @@
         <members>Constants</members>
         <members>ContactSearch</members>
         <members>CustomValidationException</members>
+        <members>DayAvailability</members>
         <members>DayPreview</members>
         <members>DeleteTemporaryAppointment</members>
         <members>DentistHelper</members>
@@ -44,6 +46,7 @@
         <members>TestFilterCriterion</members>
         <members>TestREST</members>
         <members>TestRestrictContactByName</members>
+        <members>TestSOAP</members>
         <members>TestTools</members>
         <members>TestVerifyDate</members>
         <members>TestVisibility</members>
@@ -115,6 +118,7 @@
         <members>ClosedOpportunityTrigger</members>
         <members>NoOverlapTrigger</members>
         <members>RestrictContactByName</members>
+        <members>UserTimeZoneTrigger</members>
         <name>ApexTrigger</name>
     </types>
     <types>

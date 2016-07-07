@@ -130,6 +130,21 @@ public with sharing class AccountRemoter {
     	
     	return appointment;
     }
+
+    public static List<DentistWithHours> getDentistsWithHours(Integer year, Integer month) {
+        Date dateFrom = Date.newInstance(year, month, 1);
+        Date dateTo = dateFrom.addMonths(1).addDays(-1);
+
+        List<DentistWithHours> result = new List<DentistWithHours>();
+
+        for (Dentist__c dentist : [SELECT ID, Name, Speciality__c FROM Dentist__c]) {
+            DentistHelper helper = new DentistHelper(dentist.ID);
+            DentistWithHours dwh = helper.getDentistWithHours(dateFrom, dateTo);
+            result.add(dwh);
+        }
+
+        return result;
+    }
     
     private static Appointment__c createTemporaryAppointment(ID dentistId, DateTime dateTimeStart, String sessionId) {
     	Appointment__c appointment = new Appointment__c();

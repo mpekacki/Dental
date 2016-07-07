@@ -7,9 +7,7 @@
         </span><br/>
             <apex:repeat value="{!day.ranges}" var="r">
                 <span class="{!IF(day.custom == true, 'custom ', '') + 'range'}">
-                    <apex:outputText rendered="{!r.TimeFrom != null}">
-                        <c:TimeFormatter time="{!r.TimeFrom}"/>&nbsp;-&nbsp;<c:TimeFormatter time="{!r.TimeTo}"/>
-                    </apex:outputText>
+                    <c:TimeFormatter time="{!r.TimeFrom}"/>&nbsp;-&nbsp;<c:TimeFormatter time="{!r.TimeTo}"/>
                     
                 </span><br/>
             </apex:repeat>

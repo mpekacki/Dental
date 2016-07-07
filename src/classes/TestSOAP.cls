@@ -1,16 +1,12 @@
 @isTest(SeeAllData=true)
-private class TestREST {
+private class TestSOAP {
 
 	@isTest
     static List<DentistWithHours> testGetDentistsWithHours() {
-    	RestRequest request = new RestRequest();
+    	Integer year = 2016;
+    	Integer month = 7;
 
-    	request.requestURI = 'https://eu6.salesforce.com/services/apexrest/DentistsWithHours/2016/7';
-    	request.httpMethod = 'GET';
-
-    	RestContext.request = request;
-
-        List<DentistWithHours> dwhs = RESTDentists.getDentistsAndHours();
+        List<DentistWithHours> dwhs = AppointmentRegistrationSOAPWebService.getDentistsAndHours(year, month);
         Integer noOfDentists = [SELECT ID FROM Dentist__c].size();
         
         System.assertEquals(noOfDentists, dwhs.size());
@@ -33,7 +29,7 @@ private class TestREST {
         String phone = '444444';
         String email = 'marcel.pekacki+dexter@gmail.com';
 
-    	Appointment__c app = RESTAppointment.registerAppointment(dentistId,
+    	Appointment__c app = AppointmentRegistrationSOAPWebService.registerAppointment(dentistId,
 												appointmentDate,
 												appointmentTime,
 												description,
@@ -82,7 +78,7 @@ private class TestREST {
         String email = 'marcel.pekacki+dexter@gmail.com';
 
         try{
-        	RESTAppointment.registerAppointment(dentistId,
+        	AppointmentRegistrationSOAPWebService.registerAppointment(dentistId,
 												appointmentDate,
 												appointmentTime,
 												description,
