@@ -9,6 +9,10 @@ public class TimeConverter {
     public static String formatTime(DateTime dt) {
         return formatMinutes(dt.hour() * 60 + dt.minute());
     }
+
+    public static Integer getMinutes(DateTime dt) {
+        return dt.hour() * 60 + dt.minute();
+    }
     
     public static DateTime extractTimeFrom(AvailableTime__c a) {
     	return addMinutesToDate(Math.round(a.TimeFrom__c), a.Date__c, true);

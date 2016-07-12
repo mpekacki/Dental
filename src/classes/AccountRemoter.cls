@@ -36,7 +36,7 @@ public with sharing class AccountRemoter {
     @RemoteAction
     public static void releaseLock(String sessionId) {
         List<Appointment__c> l = 
-            [SELECT Dentist__c, Date_and_time_start__c 
+            [SELECT ID
             FROM Appointment__c
             WHERE SessionId__c = :sessionId
             AND Status__c = :Constants.APPOINTMENT_STATUS_TEMPORARY];
@@ -47,11 +47,7 @@ public with sharing class AccountRemoter {
     @RemoteAction
     public static String reserveTimeSlot(String sessionId, ID dentistID, Date appointmentDate, String appointmentTime) {
     	if (sessionId != null && sessionId != 'null') {
-    		// delete previous lock
-    		List<Appointment__c> toDelete = [SELECT ID FROM Appointment__c WHERE SessionId__c = :sessionId AND Status__c = :Constants.APPOINTMENT_STATUS_TEMPORARY];
-    		if (toDelete.size() > 0) {
-    			delete toDelete;
-    		}
+    		releaseLock(sessionId);
     	} else {
     		sessionId = String.valueOf(Crypto.getRandomLong());
     	}

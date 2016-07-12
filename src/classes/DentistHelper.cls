@@ -1,37 +1,30 @@
 public with sharing class DentistHelper {
 	
 	private ID dentistId;
+    private List<AvailableTime__c> defaultHours;
 	
 	public DentistHelper(ID dentistId) {
 		this.dentistId = dentistId;
+        this.defaultHours = getDefaultHours();
 	}
 	
 	public List<AvailableTime__c> getValidHoursForRange(Date validFilterFrom, Date validFilterTo) {
     	
     	List<AvailableTime__c> result = new List<AvailableTime__c>();
-    	
-    	List<AvailableTime__c> defaultHours = [
-            SELECT Date__c, Day_of_week__c, TimeFrom__c, TimeTo__c 
-            FROM AvailableTime__c
-            WHERE 
-                Day_of_week__c != null 
-                AND 
-                Dentist__c = :this.dentistId 
-            ORDER BY 
-                Day_of_week__c ASC, 
-                TimeFrom__c ASC
-        ];
         
     	List<AvailableTime__c> customHours = [
-                SELECT Date__c, TimeFrom__c, TimeTo__c 
-                FROM AvailableTime__c 
+                SELECT 
+                    Date__c, TimeFrom__c, TimeTo__c 
+                FROM 
+                    AvailableTime__c 
                 WHERE 
                     Date__c >= :validFilterFrom 
                     AND 
                     Date__c <= :validFilterTo 
                     AND 
                     Dentist__c = :this.dentistId 
-                ORDER BY TimeFrom__c ASC
+                ORDER BY 
+                    TimeFrom__c ASC
         ];
         
         for (Date d = validFilterFrom; d <= validFilterTo; d = d.addDays(1)) {
@@ -77,7 +70,7 @@ public with sharing class DentistHelper {
     			String itemDay = getDayOfWeekName(hours[i].Date__c);
     			boolean isCustom = false;
     			try {
-    				String temp = hours[i].Day_of_week__c;
+    				String temp = hours[i].Day_of_week__c; // if day of week was queried, it's default, if not, it's custom
     			} catch (SObjectException e) {
     				isCustom = true;
     			}
@@ -111,9 +104,9 @@ public with sharing class DentistHelper {
     	for (Integer iApp = 0; iApp < overlappingApps.size(); iApp++) {
     		Appointment__c app = overlappingApps[iApp];
     		Decimal beforeSlotFrom = a.TimeFrom__c;
-    		Decimal beforeSlotTo = app.Date_and_time_start__c.hour() * 60 + app.Date_and_time_start__c.minute();
+    		Decimal beforeSlotTo = TimeConverter.getMinutes(app.Date_and_time_start__c);
     		
-    		Decimal afterSlotFrom = app.Date_and_time_end__c.hour() * 60 + app.Date_and_time_end__c.minute();
+    		Decimal afterSlotFrom = TimeConverter.getMinutes(app.Date_and_time_end__c);
     		Decimal afterSlotTo = a.TimeTo__c;
             if (afterSlotFrom == 0) {
                 afterSlotFrom = 1440;
@@ -148,7 +141,7 @@ public with sharing class DentistHelper {
         
         for (AvailableTime__c aTime : validHours) {
             if (aTime.TimeFrom__c == null) {
-                continue; // absence, therefore there will be no possible appointment times for this period
+                continue; // absence, therefore there will be no available time for this period
             }
             DateTime timeFrom = TimeConverter.extractTimeFrom(aTime);
             DateTime timeTo = TimeConverter.extractTimeTo(aTime);
@@ -218,8 +211,10 @@ public with sharing class DentistHelper {
     
     public List<Appointment__c> getBlockingAppointments(Date dateFrom, Date dateTo) {
     	return [
-    		SELECT Date_and_time_start__c, Date_and_time_end__c
-    		FROM Appointment__c
+    		SELECT 
+                Date_and_time_start__c, Date_and_time_end__c
+    		FROM 
+                Appointment__c
     		WHERE
     			Dentist__c = :dentistId
     			AND
@@ -228,31 +223,39 @@ public with sharing class DentistHelper {
     			Date_and_time_start__c >= :((DateTime)dateFrom)
     			AND 
     			Date_and_time_end__c <= :((DateTime)dateTo)
-    		ORDER BY Date_and_time_start__c ASC
+    		ORDER BY 
+                Date_and_time_start__c ASC
     	];
     }
     
     public List<AvailableTime__c> getDefaultHours(){        
         return [
-            SELECT ID, Day_of_week__c, TimeFrom__c, TimeTo__c 
-            FROM AvailableTime__c
+            SELECT 
+                ID, Day_of_week__c, TimeFrom__c, TimeTo__c 
+            FROM 
+                AvailableTime__c
             WHERE 
                 Day_of_week__c != null 
                 AND 
                 Dentist__c = :dentistId 
-            ORDER BY Day_of_week__c ASC, TimeFrom__c ASC
+            ORDER BY 
+                Day_of_week__c ASC, 
+                TimeFrom__c ASC
         ];
     }
     
     public List<AvailableTime__c> getCustomHours(){        
         return [
-            SELECT ID, Date__c, TimeFrom__c, TimeTo__c 
-            FROM AvailableTime__c
+            SELECT 
+                ID, Date__c, TimeFrom__c, TimeTo__c 
+            FROM 
+                AvailableTime__c
             WHERE 
                 Date__c != null 
                 AND 
                 Dentist__c = :dentistId
-            ORDER BY Date__c ASC
+            ORDER BY 
+                Date__c ASC
         ];
     }
         
