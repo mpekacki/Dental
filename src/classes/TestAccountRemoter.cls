@@ -5,12 +5,15 @@ private class TestAccountRemoter {
     static void testRegisterAppointment() {
         List<Dentist__c> dentists = AccountRemoter.getDentists();
         List<Date> dates = AccountRemoter.getAvailableDatesForDentist(dentists[0].ID);
-        List<DateTime> times = AccountRemoter.getAvailableTimesForDentistAndDate(dentists[0].ID, dates[0]);
+        
+        Date appDate = dates[0];
+        
+        List<String> times = AccountRemoter.getAvailableTimesForDentistAndDate(dentists[0].ID, appDate);
         
         ID dentistId = dentists[0].ID;
-        DateTime timeStart = times[0];
+        String appTime = times[0];
         
-        String sessionId = AccountRemoter.reserveTimeSlot(null, dentistId, timeStart);
+        String sessionId = AccountRemoter.reserveTimeSlot(null, dentistId, appDate, appTime);
         
         String description = 'Aua';
         String typeName = 'Treatment';
@@ -21,7 +24,8 @@ private class TestAccountRemoter {
         
         Appointment__c app = AccountRemoter.registerAppointment(sessionId,
         														dentistId,
-        														timeStart,
+        														appDate,
+                                                                appTime,
         														description,
         														typeName,
         														firstName,
@@ -34,10 +38,12 @@ private class TestAccountRemoter {
         Appointment__c insertedRecord = [SELECT ID, Dentist__c, Date_and_time_start__c, Date_and_time_end__c, Description__c, RecordType.Name, Contact__r.FirstName, Contact__r.LastName, Contact__r.Phone, Contact__r.Email
          FROM Appointment__c 
          WHERE ID = :app.ID LIMIT 1];
+
+        DateTime dateTimeStart = TimeConverter.addTimeToDate(appTime, appDate);
          
         System.assertEquals(dentistId, insertedRecord.Dentist__c);
-        System.assertEquals(timeStart, insertedRecord.Date_and_time_start__c);
-        System.assertEquals(timeStart.addMinutes(Constants.APPOINTMENT_TIME_IN_MINUTES), insertedRecord.Date_and_time_end__c);
+        System.assertEquals(dateTimeStart, insertedRecord.Date_and_time_start__c);
+        System.assertEquals(dateTimeStart.addMinutes(Constants.APPOINTMENT_TIME_IN_MINUTES), insertedRecord.Date_and_time_end__c);
         System.assertEquals(description, insertedRecord.Description__c);
         System.assertEquals(typeName, insertedRecord.RecordType.Name);
         System.assertEquals(firstName, insertedRecord.Contact__r.FirstName);

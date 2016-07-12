@@ -26,7 +26,7 @@ private class TestAppointmentListController {
     static void myUnitTest() {
     	TestAppointmentRegistrationController.testBookingAnAppointment();
         AppointmentListController ctr = new AppointmentListController();
-        ctr.filterCriteria[0].selectedValue = 'Confirmed';
+        ctr.filterCriteria[0].selectedValue = Constants.APPOINTMENT_STATUS_CONFIRMED;
         ctr.filter();
     }
 }

@@ -22,6 +22,10 @@ public class TimeConverter {
         Integer minutes = Integer.valueOf(timeStr.substring(0, 2)) * 60 + Integer.valueOf(timeStr.substring(3, 5));
         return addMinutesToDate(minutes, d, true);
     }
+
+    public static Boolean isValidHour(String hourStr) {
+        return hourStr.length() == 5 && Pattern.matches('\\d{2}:\\d{2}', hourStr);
+    }
     
     private static DateTime addMinutesToDate(Integer minutes, Date d, Boolean adjustForTZ) {
     	DateTime dt = ((DateTime)d).addMinutes(minutes);

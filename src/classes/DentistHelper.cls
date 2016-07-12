@@ -223,7 +223,7 @@ public with sharing class DentistHelper {
     		WHERE
     			Dentist__c = :dentistId
     			AND
-    			Status__c IN ('Awaiting confirmation', 'Confirmed', 'Temporary')
+    			Status__c IN (:Constants.APPOINTMENT_STATUS_AWAITING, :Constants.APPOINTMENT_STATUS_CONFIRMED, :Constants.APPOINTMENT_STATUS_TEMPORARY)
     			AND
     			Date_and_time_start__c >= :((DateTime)dateFrom)
     			AND 

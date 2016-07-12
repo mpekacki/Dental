@@ -24,8 +24,8 @@ private class TestFilterCriterion {
 
 	@isTest
     static void testCriterionOnAppointments() {
-    	Appointment__c app1 = new Appointment__c(Status__c = 'Confirmed');
-    	Appointment__c app2 = new Appointment__c(Status__c = 'Rejected');
+    	Appointment__c app1 = new Appointment__c(Status__c = Constants.APPOINTMENT_STATUS_CONFIRMED);
+    	Appointment__c app2 = new Appointment__c(Status__c = Constants.APPOINTMENT_STATUS_REJECTED);
     	
     	List<Appointment__c> apps = new List<Appointment__c>();
     	apps.add(app1);
@@ -36,11 +36,11 @@ private class TestFilterCriterion {
     	List<Appointment__c> filtered = f.filter(apps);
     	System.assertEquals(2, filtered.size());
     	
-    	f.selectedValue = 'Rejected';
+    	f.selectedValue = Constants.APPOINTMENT_STATUS_REJECTED;
     	filtered = f.filter(apps);
     	System.assertEquals(1, filtered.size());
     	
-    	f.selectedValue = 'Awaiting confirmation';
+    	f.selectedValue = Constants.APPOINTMENT_STATUS_AWAITING;
     	filtered = f.filter(apps);
     	System.assertEquals(0, filtered.size());
     }

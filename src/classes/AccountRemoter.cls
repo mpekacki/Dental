@@ -21,12 +21,12 @@ public with sharing class AccountRemoter {
     }
     
     @RemoteAction
-    public static List<DateTime> getAvailableTimesForDentistAndDate(ID dentistID, Date d) {
-    	List<DateTime> result = new List<DateTime>();
+    public static List<String> getAvailableTimesForDentistAndDate(ID dentistID, Date d) {
+    	List<String> result = new List<String>();
     	
     	for (DateTime dt : new DentistHelper(dentistID).getPossibleAppointmentStartTimes()) {
     		if (dt.date() == d) {
-    			result.add(dt);
+    			result.add(TimeConverter.formatTime(dt));
     		}
     	}
     	
@@ -34,34 +34,33 @@ public with sharing class AccountRemoter {
     }
 
     @RemoteAction
-    public static Appointment__c getReservedSlot(String sessionId) {
-        if (sessionId == null || sessionId == '') {
-            return null;
-        }
-
+    public static void releaseLock(String sessionId) {
         List<Appointment__c> l = 
             [SELECT Dentist__c, Date_and_time_start__c 
             FROM Appointment__c
-            WHERE SessionId__c = :sessionId];
+            WHERE SessionId__c = :sessionId
+            AND Status__c = :Constants.APPOINTMENT_STATUS_TEMPORARY];
 
-        if (l.size() > 0) {
-            return l[0];
-        } else {
-            return null;
-        }
+        delete l;
     }
     
     @RemoteAction
-    public static String reserveTimeSlot(String sessionId, ID dentistID, DateTime dateTimeStart) {
-    	if (sessionId != null) {
+    public static String reserveTimeSlot(String sessionId, ID dentistID, Date appointmentDate, String appointmentTime) {
+    	if (sessionId != null && sessionId != 'null') {
     		// delete previous lock
-    		List<Appointment__c> toDelete = [SELECT ID FROM Appointment__c WHERE SessionId__c = :sessionId AND Status__c = 'Temporary'];
+    		List<Appointment__c> toDelete = [SELECT ID FROM Appointment__c WHERE SessionId__c = :sessionId AND Status__c = :Constants.APPOINTMENT_STATUS_TEMPORARY];
     		if (toDelete.size() > 0) {
     			delete toDelete;
     		}
     	} else {
     		sessionId = String.valueOf(Crypto.getRandomLong());
     	}
+
+        if (appointmentTime.length() != 5 || !Pattern.matches('\\d{2}:\\d{2}', appointmentTime)) {
+            throw new CustomValidationException('Invalid format for appointmentTime');
+        }
+
+        DateTime dateTimeStart = TimeConverter.addTimeToDate(appointmentTime, appointmentDate);
     	
     	Appointment__c appointment = createTemporaryAppointment(dentistID, dateTimeStart, sessionId);
     	
@@ -71,25 +70,33 @@ public with sharing class AccountRemoter {
     }
     
     @RemoteAction
-    public static Appointment__c registerAppointment(String sessionId, 
-    												ID dentistID,
-    												DateTime dateTimeStart,
-    												String description, 
-    												String appointmentType, 
-    												String firstName, 
-    												String lastName,
-    												String phone,
-    												String email) {
+    public static Appointment__c registerAppointment(
+        String sessionId, 
+		ID dentistID,
+		Date appointmentDate,
+        String appointmentTime,
+		String description, 
+		String appointmentType, 
+		String firstName, 
+		String lastName,
+		String phone,
+		String email) {
 
         if ((email == null || email == '') && (phone == null || phone == '')) {
             throw new CustomValidationException('Email or phone are required');
         }
+
+        if (appointmentTime.length() != 5 || !Pattern.matches('\\d{2}:\\d{2}', appointmentTime)) {
+            throw new CustomValidationException('Invalid format for appointmentTime');
+        }
+
+        DateTime dateTimeStart = TimeConverter.addTimeToDate(appointmentTime, appointmentDate);
     													
     	Appointment__c appointment;							
     	
         List<Appointment__c> lApp = [SELECT ID, Date_and_time_start__c, Date_and_time_end__c, Dentist__c, Description__c, RecordTypeId 
 	    	FROM Appointment__c 
-	    	WHERE Status__c = 'Temporary' AND SessionId__c = :sessionId];
+	    	WHERE Status__c = :Constants.APPOINTMENT_STATUS_TEMPORARY AND SessionId__c = :sessionId];
     	if (lApp.size() > 0) {
             appointment = lApp[0];
         } else {
@@ -99,8 +106,12 @@ public with sharing class AccountRemoter {
 
     	appointment.Customer_phone__c = phone;
     	appointment.Description__c = description;
-    	appointment.RecordTypeId = Schema.SObjectType.Appointment__c.getRecordTypeInfosByName().get(appointmentType).getRecordTypeId();
-    	appointment.Status__c = 'Awaiting confirmation';
+        Schema.RecordTypeInfo rtInfo = Schema.SObjectType.Appointment__c.getRecordTypeInfosByName().get(appointmentType);
+        if (rtInfo == null) {
+            throw new CustomValidationException('Invalid appointment type');
+        }
+    	appointment.RecordTypeId = rtInfo.getRecordTypeId();
+    	appointment.Status__c = Constants.APPOINTMENT_STATUS_AWAITING;
     	
         List<Contact> cList;
         if(email != null && email != '') {
@@ -151,7 +162,7 @@ public with sharing class AccountRemoter {
     	appointment.Dentist__c = dentistID;
     	appointment.Date_and_time_start__c = dateTimeStart;
     	appointment.Date_and_time_end__c = dateTimeStart.addMinutes(Constants.APPOINTMENT_TIME_IN_MINUTES);
-    	appointment.Status__c = 'Temporary';
+    	appointment.Status__c = Constants.APPOINTMENT_STATUS_TEMPORARY;
     	appointment.SessionId__c = sessionId;
     	return appointment;
     }

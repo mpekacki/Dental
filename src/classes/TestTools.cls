@@ -6,5 +6,4 @@ public with sharing class TestTools {
     	return dentist;
     }
 
-
 }

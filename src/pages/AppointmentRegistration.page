@@ -57,32 +57,34 @@
 			);
 		}
 
-		function getReservedSlot(token, callback) {
+		function releaseLock(token, callback) {
 			Visualforce.remoting.Manager.invokeAction(
-				'{!$RemoteAction.AccountRemoter.getReservedSlot}',
+				'{!$RemoteAction.AccountRemoter.releaseLock}',
 				token,
 				callback,
 				{buffer: false}
 			);
 		}
 		
-		function reserveTimeSlot(token, dentistId, dateTime, callback) {
+		function reserveTimeSlot(token, dentistId, date, time, callback) {
 			Visualforce.remoting.Manager.invokeAction(
 				'{!$RemoteAction.AccountRemoter.reserveTimeSlot}',
 				token,
 				dentistId,
-				dateTime,
+				date,
+				time,
 				callback,
 				{buffer: false}
 			);
 		}
 		
-		function registerAppointment(token, dentistId, dateTime, description, type, firstName, lastName, phone, email, callback) {
+		function registerAppointment(token, dentistId, date, time, description, type, firstName, lastName, phone, email, callback) {
 			Visualforce.remoting.Manager.invokeAction(
 				'{!$RemoteAction.AccountRemoter.registerAppointment}',
 				token,
 				dentistId,
-				dateTime,
+				date,
+				time,
 				description, 
 				type, 
 				firstName, 
@@ -96,9 +98,13 @@
 		
 		function submitDetails(event) {
 			$('#panel4').find('.fa').show();
+
+			var utcDateString = getSelectedDateAsUTCString();
+
 			registerAppointment(
 				sessionStorage.token,
 				$('input[type=radio][name=dentist]:checked').val(), 
+				utcDateString,
 				$('input[type=radio][name=time]:checked').val(),
 				$('textarea[name=description]').val(),
 				$('input[name=type]:checked').val(),
@@ -109,7 +115,7 @@
 				function(result, event) {
 					if(event.status){
 						$('#panel4').find('.fa').hide();
-						$('.container').html('<div class="alert alert-success">Your appointment has been registered and submitted for approval. You will receive an email when it is processed.</div>')
+						$('.container').html('<div class="row"><div class="alert alert-success">Your appointment has been registered and submitted for approval. You will receive an email when it is processed.</div></div>')
 					} else {
 						alert(event.message);
 					}
@@ -158,18 +164,36 @@
 			$('.panel').removeClass('panel-info');
 			$('#panel' + step).addClass('panel-info');
 		}
+
+		function getSelectedDateAsUTCString() {
+			var selectedDate = $('#appDate').data("DateTimePicker").date();
+			return moment.utc(selectedDate.format('YYYY-MM-DD HH:mm')).toDate().toUTCString();
+		}
+
+		function createHourRadioOption(value, inputNo) {
+			var option = $('<input>');
+			$(option).attr('type', 'radio');
+			$(option).attr('name', 'time');
+			$(option).val(value);
+			var inputId = 'time' + inputNo;
+			$(option).attr('id', inputId);
+
+			var label = $('<label class="btn btn-default">');
+			$(label).html(value);
+			
+			$(label).prepend(option);
+
+			return label;
+		}
 		
 		$(document).ready(function() {
 		
 			if (sessionStorage.token == undefined) {
 				sessionStorage.token = null;
 			} else if (sessionStorage.token) {
-				getReservedSlot(sessionStorage.token, function(result, event) {
+				releaseLock(sessionStorage.token, function(result, event) {
 					if(event.status){
-						if (result) {
-							selectedDentistID = result.Dentist__c;
-							selectedTime = new Date(result.Date_and_time_start__c);
-						}
+						
 					} else {
 						alert(event.message);
 					}
@@ -197,26 +221,35 @@
 				toggleDetailsForm(false);
 				toggleButtons(false);
 
+				var dentistId = $('input[type=radio][name=dentist]:checked').val();
 				var utcDateString = moment.utc(e.date.format('YYYY-MM-DD HH:mm')).toDate().toUTCString();
-				getTimes($('input[type=radio][name=dentist]:checked').val(), utcDateString, function(result, event) {
+				getTimes(dentistId, utcDateString, function(result, event) {
 					if(event.status){
 						$('#times').html('');
 						var inputNo = 0;
+						var selectedWasAdded = false;
 						$.each(result, function(key, value) {
-							var d = new Date(value);
-							var option = $('<input>');
-							$(option).attr('type', 'radio');
-							$(option).attr('name', 'time');
-							$(option).val(d.toUTCString());
-							var inputId = 'time' + inputNo++;
-							$(option).attr('id', inputId);
-
-							var label = $('<label class="btn btn-default">');
-							$(label).html(d.toLocaleTimeString().substring(0,5));
-							
-							$(label).prepend(option);
-							$('#times').append(label);
+							$('#times').append(createHourRadioOption(value, inputNo++));
 						});
+
+						if (selectedTime && dentistId === selectedDentistID
+								&& utcDateString === selectedDate) {
+							var insertAfterThis = null;
+							for(var i = 0, timesChildren = $('#times').children(), l = timesChildren.length; i < l; i++) {
+								var item = timesChildren[i];
+								var value = $(item).text();
+								if (selectedTime === value) {
+									return false;
+								}
+								if (value < selectedTime) {
+									insertAfterThis = item;		
+								}
+							}
+							if (insertAfterThis) {
+								var selectedOption = createHourRadioOption(selectedTime, inputNo++);
+								$(insertAfterThis).after(selectedOption);
+							}
+						}
 						setProgress(2);
 						$('#appDate').siblings('.panel-heading').children('i.fa').hide();
 						toggleButtons(true);
@@ -292,9 +325,14 @@
 			$('#times').siblings('.panel-heading').children('i.fa').show();
 			toggleDetailsForm(false);
 			toggleButtons(false);
-			reserveTimeSlot(sessionStorage.token, $('input[type=radio][name=dentist]:checked').val(), $('input[type=radio][name=time]:checked').val(), function(result, event) {
+
+			selectedDentistID = $('input[type=radio][name=dentist]:checked').val();
+			selectedDate = getSelectedDateAsUTCString();
+			selectedTime = $('input[type=radio][name=time]:checked').val();
+
+			reserveTimeSlot(sessionStorage.token, selectedDentistID, selectedDate, selectedTime, function(result, event) {
 				if (event.status) {
-					sessionStorage.setItem('token', result);
+					sessionStorage.token = result;
 					setProgress(3);
 					toggleDetailsForm(true);
 					checkDetailsForm();

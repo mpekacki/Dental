@@ -23,7 +23,7 @@ public with sharing class AppointmentRegistrationController {
     	try {
 	    	appointment = [SELECT ID, Date_and_time_start__c, Date_and_time_end__c, Dentist__c, Description__c, RecordTypeId 
 	    	FROM Appointment__c 
-	    	WHERE Status__c = 'Temporary' AND SessionId__c = :sessionId LIMIT 1];
+	    	WHERE Status__c = :Constants.APPOINTMENT_STATUS_TEMPORARY AND SessionId__c = :sessionId LIMIT 1];
     	} catch (QueryException e) {
 	    	appointment = new Appointment__c();
     	}
@@ -143,7 +143,7 @@ public with sharing class AppointmentRegistrationController {
     	
     	appointment.SessionId__c = sessionId;
     	appointment.Date_and_time_end__c = appointment.Date_and_time_start__c.addMinutes(Constants.APPOINTMENT_TIME_IN_MINUTES);
-    	appointment.Status__c = 'Temporary';
+    	appointment.Status__c = Constants.APPOINTMENT_STATUS_TEMPORARY;
     	
     	if (appointment.Id != null && !appointment.IsDeleted) {
     		delete appointment;
@@ -158,7 +158,7 @@ public with sharing class AppointmentRegistrationController {
     
     public PageReference savePermanent() {
     	appointment.Customer_phone__c = contact.Phone;
-    	appointment.Status__c = 'Awaiting confirmation';
+    	appointment.Status__c = Constants.APPOINTMENT_STATUS_AWAITING;
     	
     	try {
     		appointment.Contact__c = [SELECT ID, FirstName, LastName FROM Contact WHERE Email = :contact.Email LIMIT 1].Id;   		

@@ -3,7 +3,7 @@ private class TestAvailableTimeController {
 
 	@isTest
     static void testCreateRecordDay() {
-    	Dentist__c dentist = TestTools.createDentist(UserInfo.getUserID());
+    	Dentist__c dentist = TestTools.createDentist();
         AvailableTimeController ctr = new AvailableTimeController();
         ctr.availableTime.TimeFrom__c = 600;
         ctr.availableTime.TimeTo__c = 960;
@@ -20,7 +20,7 @@ private class TestAvailableTimeController {
     
 	@isTest
     static void testCreateRecordDate() {
-    	Dentist__c dentist = TestTools.createDentist(UserInfo.getUserID());
+    	Dentist__c dentist = TestTools.createDentist();
         AvailableTimeController ctr = new AvailableTimeController();
         ctr.availableTime.TimeFrom__c = 600;
         ctr.availableTime.TimeTo__c = 960;
@@ -37,7 +37,7 @@ private class TestAvailableTimeController {
     
     @isTest
     static void testDeleteRecord() {
-    	Dentist__c dentist = TestTools.createDentist(UserInfo.getUserID());
+    	Dentist__c dentist = TestTools.createDentist();
     	AvailableTimeController ctr = new AvailableTimeController();
         ctr.availableTime.TimeFrom__c = 600;
         ctr.availableTime.TimeTo__c = 960;
@@ -51,7 +51,7 @@ private class TestAvailableTimeController {
     
     @isTest
     static void testGetLists() {
-    	Dentist__c dentist = TestTools.createDentist(UserInfo.getUserID());
+    	Dentist__c dentist = TestTools.createDentist();
     	AvailableTimeController ctr = new AvailableTimeController();
     	List<SelectOption> dentists = ctr.getHours();
     	List<SelectOption> types = ctr.getTypes();

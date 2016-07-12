@@ -55,7 +55,7 @@ public class TestAppointmentRegistrationController {
         ctr.savePermanent();
         
         Appointment__c insertedRecord = [SELECT ID, Status__c, Contact__c, Contact__r.Email, Dentist__r.Name FROM Appointment__c WHERE ID = :app.ID LIMIT 1];
-        System.assertEquals('Awaiting confirmation', insertedRecord.Status__c);
+        System.assertEquals(Constants.APPOINTMENT_STATUS_AWAITING, insertedRecord.Status__c);
         System.assertEquals('marcel.pekacki+bitch@gmail.com', insertedRecord.Contact__r.Email);
         System.assertEquals(Dentist.Name, insertedRecord.Dentist__r.Name);
     }

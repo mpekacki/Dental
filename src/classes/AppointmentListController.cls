@@ -12,7 +12,7 @@ public with sharing class AppointmentListController {
     public AppointmentListController() {    	
     	this.profileName = [SELECT Name FROM Profile WHERE ID = :UserInfo.getProfileId()].Name;
 
-    	List<Appointment__c> rawAppointments = [SELECT ID, Name, Date_and_time_start__c, Date_and_time_end__c, Contact__c, Status__c, RecordTypeId, Contact__r.Name, RecordType.Name, Dentist__r.Name, Dentist__r.Speciality__c FROM Appointment__c WHERE Status__c != 'Temporary'];
+    	List<Appointment__c> rawAppointments = [SELECT ID, Name, Date_and_time_start__c, Date_and_time_end__c, Contact__c, Status__c, RecordTypeId, Contact__r.Name, RecordType.Name, Dentist__r.Name, Dentist__r.Speciality__c FROM Appointment__c WHERE Status__c != :Constants.APPOINTMENT_STATUS_TEMPORARY];
     	
     	this.filterCriteria = new List<FilterCriterion>();
     	

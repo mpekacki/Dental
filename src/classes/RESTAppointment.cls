@@ -12,16 +12,11 @@ global with sharing class RESTAppointment {
 											String phone,
 											String email) {
 
-    	if (appointmentTime.length() != 5 || !Pattern.matches('\\d{2}:\\d{2}', appointmentTime)) {
-    		throw new CustomValidationException('Invalid format for appointmentTime');
-    	}
-
-    	DateTime dateTimeStart = TimeConverter.addTimeToDate(appointmentTime, appointmentDate);
-
     	Appointment__c appointment = AccountRemoter.registerAppointment(
 											    		null,
 											    		dentistID,
-											    		dateTimeStart,
+											    		appointmentDate,
+											    		appointmentTime,
 											    		description,
 											    		appointmentType,
 											    		firstName,

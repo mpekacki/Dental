@@ -17,7 +17,7 @@ trigger NoOverlapTrigger on AvailableTime__c (before insert, before update) {
                         TimeFrom__c <= :a.TimeTo__c AND TimeTo__c >= :a.TimeFrom__c 
                     )
             ].size() > 0) {
-                a.addError('There is another entry for this day that overlaps with the current one.');
+                a.addError(Constants.AVAILABLE_TIME_MESSAGE_OVERLAP);
             }
     }
 }

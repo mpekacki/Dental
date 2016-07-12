@@ -13,7 +13,7 @@ trigger AppointmentNoOverlapTrigger on Appointment__c (before insert, before upd
 	    		AND
 	    		Date_and_time_start__c < :a.Date_and_time_end__c AND Date_and_time_end__c > :a.Date_and_time_start__c
 	    		AND 
-	    		Status__c IN ('Confirmed', 'Awaiting confirmation', 'Temporary')
+	    		Status__c IN (:Constants.APPOINTMENT_STATUS_CONFIRMED, :Constants.APPOINTMENT_STATUS_AWAITING, :Constants.APPOINTMENT_STATUS_TEMPORARY)
     	].size() > 0) {
     		a.addError('There is another appointment that overlaps with this one.');
     	}

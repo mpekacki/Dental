@@ -68,7 +68,7 @@ private class TestSOAP {
 
         DateTime timeStart = TimeConverter.addTimeToDate(appointmentTime, appointmentDate);
 
-        AccountRemoter.reserveTimeSlot(null, dentistId, timeStart);
+        AccountRemoter.reserveTimeSlot(null, dentistId, appointmentDate, appointmentTime);
         
         String description = 'Aua';
         String typeName = 'Treatment';
