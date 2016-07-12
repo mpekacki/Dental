@@ -115,7 +115,20 @@
 				function(result, event) {
 					if(event.status){
 						$('#panel4').find('.fa').hide();
-						$('.container').html('<div class="row"><div class="alert alert-success">Your appointment has been registered and submitted for approval. You will receive an email when it is processed.</div></div>')
+						$('.container').html('<div class="alert alert-success">Your appointment has been registered and submitted for approval. You will receive an email when it is processed.</div>');
+
+						var summary = $('<div class="panel">');
+						$(summary).append($('<h3>Appointment with ' + result.Dentist__r.Name + '</h3>'));
+						$(summary).append($('<p>' + moment(result.Date_and_time_start__c).format('LLLL') + ' - ' + moment(result.Date_and_time_end__c).format('LLLL') +'</p>'));
+
+						$('.container').append(summary);
+
+						var dentistNameEncoded = encodeURIComponent(result.Dentist__r.Name);
+						var dateFromEncoded = new Date(result.Date_and_time_start__c).toISOString().replace(/-|:|\.\d\d\d/g,"");
+						var dateToEncoded = new Date(result.Date_and_time_end__c).toISOString().replace(/-|:|\.\d\d\d/g,"");
+						var calUrl = 'https://www.google.com/calendar/render?action=TEMPLATE&text=Appointment+with+' + dentistNameEncoded +'&dates=' + dateFromEncoded +'/' + dateToEncoded +'&details=Dental+appointment+with+' + dentistNameEncoded + '.' + (result.Description__c ? ('+Description:+' + encodeURIComponent(result.Description__c)) : '') + '&location=MentalDental&sf=true&output=xml';
+						var addToCalButton = $('<a href="' + calUrl +'" class="btn btn-primary">Add to Google Calendar</a>');
+						$('.container').append(addToCalButton);
 					} else {
 						alert(event.message);
 					}
@@ -417,7 +430,7 @@
 			<div class="row">
 				<div class="form-group panel col-md-12" id="panel4">
 					<button type="submit" class="btn btn-primary btn-block btn-lg" id="submit">Submit</button>
-					<i class="fa fa-circle-o-notch fa-spin pull-right"></i>
+					<i class="fa fa-circle-o-notch fa-spin"></i>
 				</div>
 			</div>
 		</form>

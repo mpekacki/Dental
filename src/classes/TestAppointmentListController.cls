@@ -19,14 +19,15 @@
  *
  * See the Apex Language Reference for more information about Testing and Code Coverage.
  */
-@isTest(SeeAllData=true)
+@isTest
 private class TestAppointmentListController {
 
 	@isTest
     static void myUnitTest() {
-    	TestAppointmentRegistrationController.testBookingAnAppointment();
+    	Test.startTest();
         AppointmentListController ctr = new AppointmentListController();
         ctr.filterCriteria[0].selectedValue = Constants.APPOINTMENT_STATUS_CONFIRMED;
         ctr.filter();
+        Test.stopTest();
     }
 }

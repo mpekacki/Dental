@@ -94,7 +94,7 @@ public with sharing class AccountRemoter {
     													
     	Appointment__c appointment;							
     	
-        List<Appointment__c> lApp = [SELECT ID, Date_and_time_start__c, Date_and_time_end__c, Dentist__c, Description__c, RecordTypeId 
+        List<Appointment__c> lApp = [SELECT ID, Date_and_time_start__c, Date_and_time_end__c, Dentist__c, Description__c, RecordTypeId, Dentist__r.Name
 	    	FROM Appointment__c 
 	    	WHERE Status__c = :Constants.APPOINTMENT_STATUS_TEMPORARY AND SessionId__c = :sessionId];
     	if (lApp.size() > 0) {
@@ -102,6 +102,10 @@ public with sharing class AccountRemoter {
         } else {
             appointment = createTemporaryAppointment(dentistID, dateTimeStart, sessionId);
             insert appointment;
+            appointment = [SELECT ID, Date_and_time_start__c, Date_and_time_end__c, Dentist__c, Description__c, RecordTypeId, Dentist__r.Name
+                FROM Appointment__c 
+                WHERE ID = :appointment.ID 
+                LIMIT 1];
         }
 
     	appointment.Customer_phone__c = phone;

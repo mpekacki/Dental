@@ -1,9 +1,20 @@
 <apex:page controller="AppointmentListController">
+    <apex:includeScript value="{! URLFOR($Resource.jQuery224)}"/>
+
+    <script>
+
+    $(document).ready(function() {
+        filterAppointments();
+    });
+
+    </script>
+
 	<apex:sectionHeader title="{!IF(profileName == 'Dentist', 'My appointments', 'All appointments')}"/>
     <apex:pageblock id="appointments">
     
     	<apex:pageBlockButtons location="top">
     		<apex:form >
+                <apex:actionfunction action="{!filter}" name="filterAppointments" rerender="appointmentList"/>
     			<apex:pageBlockSection >
 		    		<apex:repeat value="{!filterCriteria}" var="f">
 		    			<apex:selectList value="{!f.selectedValue}" label="{!f.filterLabel}" size="1">
@@ -15,7 +26,7 @@
     		</apex:form>
     	</apex:pageBlockButtons>
     
-        <apex:pageBlockTable value="{!appointments}" var="a">
+        <apex:pageBlockTable value="{!appointments}" var="a" id="appointmentList">
             <apex:column headerValue="Name">
             	<apex:outputLink value="{!URLFOR($Action.Appointment__c.View, a.appointment.Id)}">{!a.appointment.Name}</apex:outputLink>
             </apex:column>
