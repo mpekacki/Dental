@@ -1,4 +1,4 @@
-global with sharing class AppointmentRegistrationSOAPWebService {
+global class AppointmentRegistrationSOAPWebService {
 	
     webservice static List<DentistWithHours> getDentistsAndHours(Integer year, Integer month) {
     	return AccountRemoter.getDentistsWithHours(year, month);

@@ -12,7 +12,8 @@ public with sharing class AppointmentListController {
     public AppointmentListController() {    	
     	this.profileName = [SELECT Name FROM Profile WHERE ID = :UserInfo.getProfileId()].Name;
 
-    	List<Appointment__c> rawAppointments = [SELECT ID, Name, Date_and_time_start__c, Date_and_time_end__c, Contact__c, Status__c, RecordTypeId, Contact__r.Name, RecordType.Name, Dentist__r.Name, Dentist__r.Speciality__c FROM Appointment__c WHERE Status__c != :Constants.APPOINTMENT_STATUS_TEMPORARY];
+    	Map<ID,Appointment__c> mApp = new Map<ID,Appointment__c>([SELECT ID, Name, Date_and_time_start__c, Date_and_time_end__c, Contact__c, Status__c, RecordTypeId, Contact__r.Name, RecordType.Name, Dentist__r.Name, Dentist__r.Speciality__c FROM Appointment__c WHERE Status__c != :Constants.APPOINTMENT_STATUS_TEMPORARY]);
+    	List<Appointment__c> rawAppointments = mApp.values();
     	
     	this.filterCriteria = new List<FilterCriterion>();
     	
@@ -20,15 +21,18 @@ public with sharing class AppointmentListController {
     	this.filterCriteria.add(new FilterCriterion(rawAppointments, 'Contact__c', 'Contact__r.Name', 'Customer'));
     	this.filterCriteria.add(new FilterCriterion(rawAppointments, 'RecordTypeId', 'RecordType.Name', 'Type'));
     	
-    	if (profileName == 'Clinic owner') {
+    	if (Constants.PROFILE_NAME_OWNER.equals(profileName)) {
 	    	this.filterCriteria.add(new FilterCriterion(rawAppointments, 'Dentist__c', 'Dentist__r.Name', 'Dentist'));
 	    	this.filterCriteria.add(new FilterCriterion(rawAppointments, 'Dentist__r.Speciality__c', 'Dentist__r.Speciality__c', 'Dentist speciality'));
     	}
     	
     	appointmentsUnfiltered = new List<AppointmentViewRow>();
+
+    	List<ProcessInstanceWorkitem> piwis = [SELECT ID, ProcessInstance.TargetObjectID FROM ProcessInstanceWorkitem WHERE ProcessInstance.TargetObjectID IN :mApp.keySet() AND ActorId = :UserInfo.getUserId()];
     	
     	for (Appointment__c a : rawAppointments) {
-    		appointmentsUnfiltered.add(new AppointmentViewRow(a));
+
+    		appointmentsUnfiltered.add(new AppointmentViewRow(a, getWorkItemId(piwis, a.ID)));
     	}
     	
     	appointments = appointmentsUnfiltered;
@@ -41,6 +45,15 @@ public with sharing class AppointmentListController {
 		}
 		
 		return null;
+	}
+
+	private ID getWorkItemId(List<ProcessInstanceWorkitem> piwis, ID appointmentID) {
+		for (ProcessInstanceWorkitem piwi : piwis) {
+    		if (piwi.ProcessInstance.TargetObjectID == appointmentID) {
+    			return piwi.ID;
+    		}
+    	}
+    	return null;
 	}
 	
 	private List<AppointmentViewRow> filter(FilterCriterion f, List<AppointmentViewRow> l) {
@@ -59,19 +72,9 @@ public with sharing class AppointmentListController {
 		public Appointment__c appointment {get; private set;}
 		public ID workItemID {get; private set;}
 		
-		public AppointmentViewRow(Appointment__c appointment) {
+		public AppointmentViewRow(Appointment__c appointment, ID workItemID) {
 			this.appointment = appointment;
-			this.workItemID = getWorkItemID(appointment.ID);
+			this.workItemID = workItemID;
 		}
-		
-		private ID getWorkItemID(ID objectID){
-			try {
-	    		ID processInstanceId = [SELECT ID FROM ProcessInstance WHERE TargetObjectID = :objectID].ID;
-				ID workItemID = [SELECT ID FROM ProcessInstanceWorkitem WHERE ProcessInstanceId = :processInstanceId AND ActorId = :UserInfo.getUserId()].ID;
-				return workItemID;
-	    	} catch (Exception e) {
-	    		return null;
-	    	}
-	    }
 	}
 }

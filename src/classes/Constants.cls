@@ -10,4 +10,7 @@ public class Constants {
 	public static final String APPOINTMENT_STATUS_REJECTED = 'Rejected';
 
 	public static final String AVAILABLE_TIME_MESSAGE_OVERLAP = 'There is another entry for this day that overlaps with the current one.';
+
+	public static final String PROFILE_NAME_OWNER = 'Clinic owner';
+	public static final String PROFILE_NAME_DENTIST = 'Dentist';
 }
