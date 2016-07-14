@@ -1,11 +1,41 @@
 <apex:page controller="AppointmentListController">
     <apex:includeScript value="{! URLFOR($Resource.jQuery224)}"/>
 
+    <apex:includeScript value="{! URLFOR($Resource.Tablesorter, '/jquery.tablesorter.min.js')}"/>
+    <apex:stylesheet value="{! URLFOR($Resource.Tablesorter, '/themes/blue/style.css')}"/>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+
     <script>
 
     $(document).ready(function() {
         filterAppointments();
+
+        $.tablesorter.addParser({
+            id: 'apexDate',
+            is: function(s) {
+                return false;
+            },
+            format: function(s) {
+                return +(moment(s, 'DD-MM-YYYY HH:mm').format('X'));
+            },
+            type: 'numeric'
+        });
     });
+
+    function runTablesorter() {
+        $('table[id$=appointmentList]').tablesorter({
+            widgets: ["zebra"],
+            headers: {
+                1: {
+                    sorter: 'apexDate'
+                },
+                2: {
+                    sorter: 'apexDate'
+                }
+            }
+        });
+    }
 
     </script>
 
@@ -14,19 +44,19 @@
     
     	<apex:pageBlockButtons location="top">
     		<apex:form >
-                <apex:actionfunction action="{!filter}" name="filterAppointments" rerender="appointmentList"/>
+                <apex:actionfunction action="{!filter}" name="filterAppointments" rerender="appointmentList" oncomplete="runTablesorter()"/>
     			<apex:pageBlockSection >
 		    		<apex:repeat value="{!filterCriteria}" var="f">
 		    			<apex:selectList value="{!f.selectedValue}" label="{!f.filterLabel}" size="1">
 		    				<apex:selectOptions value="{!f.picklistValues}"/>
-		    				<apex:actionSupport rerender="appointments" action="{!filter}" event="onchange"/>
+		    				<apex:actionSupport rerender="appointments" action="{!filter}" event="onchange" oncomplete="runTablesorter()"/>
 		    			</apex:selectList>
 		    		</apex:repeat>
 	    		</apex:pageBlockSection>
     		</apex:form>
     	</apex:pageBlockButtons>
     
-        <apex:pageBlockTable value="{!appointments}" var="a" id="appointmentList">
+        <apex:pageBlockTable value="{!appointments}" var="a" id="appointmentList" styleClass="tablesorter">
             <apex:column headerValue="Name">
             	<apex:outputLink value="{!URLFOR($Action.Appointment__c.View, a.appointment.Id)}">{!a.appointment.Name}</apex:outputLink>
             </apex:column>

@@ -1,17 +1,7 @@
 <apex:page docType="html-5.0" showHeader="false" standardStylesheets="false" applyBodyTag="false" applyHtmlTag="false" controller="AccountRemoter">
 <html lang="en">
 <head>
-	<apex:includeScript value="{! URLFOR($Resource.jQuery224)}"/>
 
-	<apex:includeScript value="{! URLFOR($Resource.Bootstrap, '/bootstrap-3.3.6-dist/js/bootstrap.min.js')}"/>
-	<apex:stylesheet value="{! URLFOR($Resource.Bootstrap, 'bootstrap-3.3.6-dist/css/bootstrap.min.css')}"/>
-
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css"></link>
-
-	
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css"></link>
 
 	<style type="text/css">
 		td.day:not(.disabled) {
@@ -36,6 +26,107 @@
 </head>
 
 <body>
+
+	<div class="container">
+		<div class="well well-sm footer navbar-fixed-bottom">
+			<h4 id="step"></h4>
+			<div class="progress">
+				<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="4">
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="page-header">
+					<h1>MentalDental</h1>
+					<h5>appointment registration</h5>
+				</div>
+			</div>
+		</div>
+		<form class="form" id="mainForm" role="form">
+			<div class="row">
+				<div class="col-md-5">
+					<div class="panel" id="panel0">
+						<div class="panel-heading">Dentist<i class="fa fa-circle-o-notch fa-spin pull-right"></i></div>
+						<div id="dentists" class="panel-body btn-group-vertical blockable" data-toggle="buttons">
+						</div>
+					</div>
+					<div class="panel" id="panel1">
+						<div class="panel-heading">Appointment date<i class="fa fa-circle-o-notch fa-spin pull-right"></i></div>
+						<div class="panel-body" id="appDate"></div>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="panel" id="panel2">
+						<div class="panel-heading">Appointment hour<i class="fa fa-circle-o-notch fa-spin pull-right"></i></div>
+						<div id="times" class="form-group panel-body btn-group blockable" data-toggle="buttons">
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="panel" id="panel3">
+						<div class="panel-heading">Details<i class="fa fa-circle-o-notch fa-spin pull-right"></i></div>
+						<div class="panel-body form-group" id="details">
+
+							<label for="types">Appointment type</label>
+							<div id="types" class="btn-group" data-toggle="buttons">
+								<label class="btn btn-default active">
+									<input type="radio" name="type" value="Consultation" checked="checked"></input>Consultation
+								</label>
+								<label class="btn btn-default">
+									<input type="radio" name="type" value="Treatment"></input>Treatment
+								</label>
+							</div>
+							
+							<label for="description">Description</label><textarea name="description" class="form-control" id="description"></textarea>
+							<small class="text-muted">Description is only available for Treatment</small><br/>
+							<label for="firstname">First name</label><input type="text" name="firstname" class="form-control" id="firstname"></input>
+							<label for="lastname">Last name</label><input type="text" name="lastname" class="form-control" id="lastname"></input>
+							<label for="phone">Phone</label><input type="text" name="phone" class="form-control" id="phone"></input>
+							<label for="email">Email</label><input type="email" name="email" class="form-control" id="email"></input>
+							
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group panel col-md-12" id="panel4">
+					<button type="submit" class="btn btn-primary btn-block btn-lg" id="submit">Submit</button>
+					<i class="fa fa-circle-o-notch fa-spin"></i>
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<div id="slotTakenModal" class="modal fade" role="dialog">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Message</h4>
+	      </div>
+	      <div class="modal-body">
+	        <p>The selected hour has been taken by someone else. Please select another hour.</p>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+
+	  </div>
+	</div>
+
+	<apex:includeScript value="{! URLFOR($Resource.jQuery224)}"/>
+
+	<apex:includeScript value="{! URLFOR($Resource.Bootstrap, '/bootstrap-3.3.6-dist/js/bootstrap.min.js')}"/>
+	<apex:stylesheet value="{! URLFOR($Resource.Bootstrap, 'bootstrap-3.3.6-dist/css/bootstrap.min.css')}"/>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css"></link>
+
+	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css"></link>
 
 	<script> 
 		"use strict";
@@ -388,96 +479,6 @@
 			}
 		});
 	</script>
-
-
-	<div class="container">
-		<div class="well well-sm footer navbar-fixed-bottom">
-			<h4 id="step"></h4>
-			<div class="progress">
-				<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="4">
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12">
-				<div class="page-header">
-					<h1>MentalDental</h1>
-					<h5>appointment registration</h5>
-				</div>
-			</div>
-		</div>
-		<form class="form" id="mainForm" role="form">
-			<div class="row">
-				<div class="col-md-5">
-					<div class="panel" id="panel0">
-						<div class="panel-heading">Dentist<i class="fa fa-circle-o-notch fa-spin pull-right"></i></div>
-						<div id="dentists" class="panel-body btn-group-vertical blockable" data-toggle="buttons">
-						</div>
-					</div>
-					<div class="panel" id="panel1">
-						<div class="panel-heading">Appointment date<i class="fa fa-circle-o-notch fa-spin pull-right"></i></div>
-						<div class="panel-body" id="appDate"></div>
-					</div>
-				</div>
-				<div class="col-md-3">
-					<div class="panel" id="panel2">
-						<div class="panel-heading">Appointment hour<i class="fa fa-circle-o-notch fa-spin pull-right"></i></div>
-						<div id="times" class="form-group panel-body btn-group blockable" data-toggle="buttons">
-						</div>
-					</div>
-				</div>
-				<div class="col-md-4">
-					<div class="panel" id="panel3">
-						<div class="panel-heading">Details<i class="fa fa-circle-o-notch fa-spin pull-right"></i></div>
-						<div class="panel-body form-group" id="details">
-
-							<label for="types">Appointment type</label>
-							<div id="types" class="btn-group" data-toggle="buttons">
-								<label class="btn btn-default active">
-									<input type="radio" name="type" value="Consultation" checked="checked"></input>Consultation
-								</label>
-								<label class="btn btn-default">
-									<input type="radio" name="type" value="Treatment"></input>Treatment
-								</label>
-							</div>
-							
-							<label for="description">Description</label><textarea name="description" class="form-control" id="description"></textarea>
-							<small class="text-muted">Description is only available for Treatment</small><br/>
-							<label for="firstname">First name</label><input type="text" name="firstname" class="form-control" id="firstname"></input>
-							<label for="lastname">Last name</label><input type="text" name="lastname" class="form-control" id="lastname"></input>
-							<label for="phone">Phone</label><input type="text" name="phone" class="form-control" id="phone"></input>
-							<label for="email">Email</label><input type="email" name="email" class="form-control" id="email"></input>
-							
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="form-group panel col-md-12" id="panel4">
-					<button type="submit" class="btn btn-primary btn-block btn-lg" id="submit">Submit</button>
-					<i class="fa fa-circle-o-notch fa-spin"></i>
-				</div>
-			</div>
-		</form>
-	</div>
-
-	<div id="slotTakenModal" class="modal fade" role="dialog">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Message</h4>
-	      </div>
-	      <div class="modal-body">
-	        <p>The selected hour has been taken by someone else. Please select another hour.</p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-	      </div>
-	    </div>
-
-	  </div>
-	</div>
 	</body>
 </html>
 </apex:page>
