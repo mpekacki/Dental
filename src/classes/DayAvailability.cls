@@ -1,10 +1,10 @@
-global with sharing class DayAvailability {
+global class DayAvailability {
     
-    public Date day;
-    public List<HourRange> availableHours = new List<HourRange>();
+    webservice Date day;
+    webservice List<HourRange> availableHours = new List<HourRange>();
 
     global class HourRange {
-    	public String timeFrom;
-    	public String timeTo;
+    	webservice String timeFrom;
+    	webservice String timeTo;
     }
 }

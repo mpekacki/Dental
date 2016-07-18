@@ -220,9 +220,9 @@ public with sharing class DentistHelper {
     			AND
     			Status__c IN (:Constants.APPOINTMENT_STATUS_AWAITING, :Constants.APPOINTMENT_STATUS_CONFIRMED, :Constants.APPOINTMENT_STATUS_TEMPORARY)
     			AND
-    			Date_and_time_start__c >= :((DateTime)dateFrom)
+    			Date_and_time_start__c >= :DateTime.newInstance(dateFrom.year(), dateFrom.month(), dateFrom.day())
     			AND 
-    			Date_and_time_end__c <= :((DateTime)dateTo)
+    			Date_and_time_end__c <= :DateTime.newInstance(dateTO.year(), dateTo.month(), dateTo.day())
     		ORDER BY 
                 Date_and_time_start__c ASC
     	];

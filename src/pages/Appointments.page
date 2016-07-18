@@ -65,8 +65,8 @@
             <apex:column value="{!a.appointment.Contact__c}"/>
             <apex:column value="{!a.appointment.Status__c}"/>
             <apex:column value="{!a.appointment.RecordType.Name}"/>
-            <apex:column value="{!a.appointment.Dentist__r.Name}" rendered="{!IF(profileName == 'Clinic owner', true, false)}"/>
-            <apex:column value="{!a.appointment.Dentist__r.Speciality__c}" rendered="{!IF(profileName == 'Clinic owner', true, false)}"/>
+            <apex:column value="{!a.appointment.Dentist__r.Name}" rendered="{!IF(OR(profileName == 'Clinic owner', profileName == 'System Administrator'), true, false)}"/>
+            <apex:column value="{!a.appointment.Dentist__r.Speciality__c}" rendered="{!IF(OR(profileName == 'Clinic owner', profileName == 'System Administrator'), true, false)}"/>
             <apex:column headerValue="Actions">
             	<apex:outputLink rendered="{!IF(a.workItemID != null, true, false)}" value="/p/process/ProcessInstanceWorkitemWizardStageManager?id={!a.workItemId}">Approve/Reject</apex:outputLink>
             </apex:column>

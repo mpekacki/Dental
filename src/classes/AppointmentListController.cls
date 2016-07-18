@@ -21,7 +21,7 @@ public with sharing class AppointmentListController {
     	this.filterCriteria.add(new FilterCriterion(rawAppointments, 'Contact__c', 'Contact__r.Name', 'Customer'));
     	this.filterCriteria.add(new FilterCriterion(rawAppointments, 'RecordTypeId', 'RecordType.Name', 'Type'));
     	
-    	if (Constants.PROFILE_NAME_OWNER.equals(profileName)) {
+    	if (Constants.PROFILE_NAME_OWNER.equals(profileName) || 'System Administrator'.equals(profileName)) {
 	    	this.filterCriteria.add(new FilterCriterion(rawAppointments, 'Dentist__c', 'Dentist__r.Name', 'Dentist'));
 	    	this.filterCriteria.add(new FilterCriterion(rawAppointments, 'Dentist__r.Speciality__c', 'Dentist__r.Speciality__c', 'Dentist speciality'));
     	}

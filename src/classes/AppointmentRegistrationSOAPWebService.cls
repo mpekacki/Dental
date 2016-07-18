@@ -1,7 +1,8 @@
 global class AppointmentRegistrationSOAPWebService {
 	
     webservice static List<DentistWithHours> getDentistsAndHours(Integer year, Integer month) {
-    	return AccountRemoter.getDentistsWithHours(year, month);
+    	List<DentistWithHours> result = AccountRemoter.getDentistsWithHours(year, month);
+    	return result;
     }
 
     webservice static Appointment__c registerAppointment(ID dentistID,

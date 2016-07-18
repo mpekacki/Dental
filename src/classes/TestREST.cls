@@ -5,7 +5,7 @@ private class TestREST {
     static List<DentistWithHours> testGetDentistsWithHours() {
     	RestRequest request = new RestRequest();
 
-    	request.requestURI = 'https://eu6.salesforce.com/services/apexrest/DentistsWithHours/2016/7';
+    	request.requestURI = 'https://eu6.salesforce.com/services/apexrest/DentistsWithHours?year=2016&month=7';
     	request.httpMethod = 'GET';
 
     	RestContext.request = request;

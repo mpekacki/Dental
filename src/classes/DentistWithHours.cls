@@ -1,5 +1,5 @@
-global with sharing class DentistWithHours {
+global class DentistWithHours {
     
-    public Dentist__c dentist;
-    public List<DayAvailability> availableDays = new List<DayAvailability>();
+    webservice Dentist__c dentist;
+    webservice List<DayAvailability> availableDays = new List<DayAvailability>();
 }

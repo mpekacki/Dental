@@ -1,8 +1,8 @@
-trigger NoOverlapTrigger on AvailableTime__c (before insert, before update) {
+trigger AvailableTimeNoOverlapTrigger on AvailableTime__c (before insert, before update) {
     
     for (AvailableTime__c a : Trigger.New) {
         
-            // check if another record for the same day does not overlap with the new record
+            // check if another record for the same day does not overlap with the new record 
             if ([
                 SELECT ID 
                 FROM AvailableTime__c 

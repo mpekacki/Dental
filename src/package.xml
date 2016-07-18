@@ -115,6 +115,7 @@
         <members>AppointmentNoOverlapTrigger</members>
         <members>AppointmentSetNameTrigger</members>
         <members>AppointmentTimeEndTrigger</members>
+        <members>AvailableTimeNoOverlapTrigger</members>
         <members>ClosedOpportunityTrigger</members>
         <members>NoOverlapTrigger</members>
         <members>RestrictContactByName</members>
