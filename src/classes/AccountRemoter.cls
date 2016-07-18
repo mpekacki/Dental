@@ -138,6 +138,23 @@ public with sharing class AccountRemoter {
     	update appointment;
     	
     	submitForApproval(appointment.Id);
+
+        appointment = [
+            SELECT 
+                ID, 
+                Customer_phone__c, 
+                Date_and_time_start__c, 
+                Date_and_time_end__c,
+                Dentist__r.Name,
+                Dentist__r.Speciality__c,
+                Description__c,
+                RecordType.Name,
+                Status__c
+            FROM
+                Appointment__c
+            WHERE
+                ID = :appointment.ID
+        ];
     	
     	return appointment;
     }
